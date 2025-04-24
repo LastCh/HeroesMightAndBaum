@@ -26,7 +26,7 @@ public class GameManager {
         field.getCell(8, 8).addObject(botCastle);
         field.getCell(1, 1).addObject(playerCastle);
 
-        this.human = new HumanPlayer(new Position(0, 0), 10, playerCastle, 2000);
+        this.human = new HumanPlayer(new Position(0, 0), 10, playerCastle, 1000);
         this.computer = new ComputerPlayer(new Position(9, 9), playerCastle.getPosition(), 10, botCastle, 500);
 
         field.getCell(0, 0).addObject(human);

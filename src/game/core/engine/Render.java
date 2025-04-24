@@ -31,6 +31,7 @@ public class Render {
 
     public void startGameLoop() {
         boolean running = true;
+        System.out.println("Для начала игры купите первое здание в свой замок и наймите юнитов, чтобы ваш герой смог передвигаться!");
         while (running) {
             renderField();
             menu.callGame();

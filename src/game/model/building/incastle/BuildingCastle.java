@@ -1,15 +1,15 @@
 package game.model.building.incastle;
 
-import game.model.building.onmap.Castle;
-import game.model.player.Player;
-
 public abstract class BuildingCastle {
     protected int cost;
-    protected final Castle affiliationCastle;
-    protected final Player affiliationPlayer;
 
-    public BuildingCastle(Castle castle, Player player) {
-        affiliationCastle = castle;
-        affiliationPlayer = player;
+    public BuildingCastle() { }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost1) {
+        this.cost = cost1;
     }
 }

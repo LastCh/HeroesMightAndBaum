@@ -44,7 +44,7 @@ public class MenuManager {
 
         do {
             System.out.println("Игровое меню:");
-            System.out.println("1. Зайти в замок");
+            System.out.println("1. Управление замком");
             System.out.println("2. Вернуться в игру");
             System.out.println("3. Вернуться в главное меню");
 
