@@ -1,15 +1,17 @@
 package game.interf;
 
 import game.model.building.incastle.BuildingCastle;
+import game.model.building.incastle.GuardPost;
 import game.model.building.incastle.Stable;
 import game.model.building.incastle.Tavern;
+import game.model.player.HumanPlayer;
 
 public class BuyBuildingMenu extends Inter {
     private int gold = 200;
+    private GuardPost guardPost;
 
     @Override
     public void display() {
-
         System.out.println("Меню покупки зданий:");
         System.out.println("1. Купить таверну (10 золота)");
         System.out.println("2. Купить конюшню (20 золота)");
@@ -21,8 +23,7 @@ public class BuyBuildingMenu extends Inter {
         System.out.println("8. Вернуться в главное меню");
     }
 
-    @Override
-    public int handleInput() {
+    public int handleInput(HumanPlayer player) {
         int choice = super.handleInput();
         clearConsole();
         switch (choice) {
@@ -41,7 +42,14 @@ public class BuyBuildingMenu extends Inter {
                 }
                 break;
             case 3:
-                System.out.println("Возврат в игровое меню...");
+                if (!player.haveMoney(10)) {
+                    System.out.println("Не хватает золота!");
+                    break;
+                }
+
+                player.spendMoney(10);
+                player.getMyCastle().addBuilding(guardPost);
+                System.out.println("Сторожевая башня куплена, теперь вы можете приобретать копейщиков!");
                 break;
             case 4:
                 System.out.println("Возврат в игровое меню...");

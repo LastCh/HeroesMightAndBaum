@@ -7,12 +7,10 @@ import game.api.FieldObject;
 import game.map.Field;
 import game.model.building.onmap.Castle;
 import game.model.unit.Unit;
-
 import java.util.ArrayList;
-import java.util.List;
 
 public abstract class Player extends FieldObject implements Movable {
-    private final List<Unit> objects = new ArrayList<>();
+    protected ArrayList<Unit> units = new ArrayList<>();
     protected Direction direction;
     protected Castle myCastle;
     protected int maxMovementPoints;
@@ -130,5 +128,25 @@ public abstract class Player extends FieldObject implements Movable {
         movementPoints = maxMovementPoints;
         diag = 0;
         accumulatedMovementCoef = 0.0;
+    }
+
+    public ArrayList<Unit> getUnits() {
+        return units;
+    }
+
+    public void setUnits(ArrayList<Unit> uni) {
+        this.units = uni;
+    }
+
+    public void addUnits(Unit unit) {
+        this.units.add(unit);
+    }
+
+    public boolean haveMoney(int cost) {
+        return this.gold >= cost;
+    }
+
+    public void spendMoney(int cost) {
+        gold -= cost;
     }
 }

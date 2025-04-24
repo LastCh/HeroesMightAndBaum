@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Castle extends FieldObject implements Immovable {
-    private final List<BuildingCastle> objects = new ArrayList<>();
+    private final ArrayList<BuildingCastle> buildings = new ArrayList<>();
     private final Scanner scanner;
     private int health;
     private final int maxHealth;
@@ -25,15 +25,15 @@ public class Castle extends FieldObject implements Immovable {
     }
 
     public boolean contains(BuildingCastle obj) {
-        return objects.contains(obj);
+        return buildings.contains(obj);
     }
 
-    public void addObject(BuildingCastle obj) {
-        objects.add(obj);
+    public void addBuilding(BuildingCastle build) {
+        buildings.add(build);
     }
 
     public List<BuildingCastle> getBuildings() {
-        return new ArrayList<>(objects);
+        return new ArrayList<>(buildings);
     }
 
     public Castle(Position position, Scanner scanner, String color, int maxHe) {

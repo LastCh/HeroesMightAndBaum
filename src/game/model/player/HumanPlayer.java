@@ -16,7 +16,6 @@ public class HumanPlayer extends Player {
     @Override
     public void interact(Player player) {
         System.out.println("Игрок взаимодействует с другим игроком.");
-        // Логика взаимодействия
     }
 
     public void move(int dx, int dy, Field field, int d) {
@@ -25,6 +24,12 @@ public class HumanPlayer extends Player {
         int newDiag = diag + d;
         int cost = movementPoints;
         double newAccumulatedMovementCoef = accumulatedMovementCoef;
+
+        //Проверка на наличие отряда
+        if (units.isEmpty()) {
+            System.out.println("У вашего героя нет юнитов, купите их!");
+            return;
+        }
 
         //Проверка возможность перемещения по позиции
         if (!isValidPosition(newPos)) {
@@ -73,7 +78,6 @@ public class HumanPlayer extends Player {
         diag = newDiag;
         field.moveObject(this, this.position.x(), this.position.y(), newPos.x(), newPos.y());
         this.position = newPos;
-
     }
 
     public boolean targetCheck(Field field, Position newPos) {
@@ -110,4 +114,5 @@ public class HumanPlayer extends Player {
                 ((movementPoints > 1) && (newDiag % 2 == 0) && (oldDiag != 0)) ||
                 ((movementPoints > 1) && (oldDiag == 0)));
     }
+
 }

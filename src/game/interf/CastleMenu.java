@@ -1,5 +1,6 @@
-// CastleMenu.java
 package game.interf;
+
+import game.model.player.HumanPlayer;
 
 public class CastleMenu extends Inter {
     private final BuyBuildingMenu buyBuildingMenu = new BuyBuildingMenu();
@@ -8,25 +9,23 @@ public class CastleMenu extends Inter {
 
     @Override
     public void display() {
-
         System.out.println("Меню замка:");
         System.out.println("1. Улучшить замок");
         System.out.println("2. Нанять юнитов");
         System.out.println("3. Вернуться в главное меню");
     }
 
-    @Override
-    public int handleInput() {
+    public int handleInput(HumanPlayer player) {
         int choice = super.handleInput();
         clearConsole();
         switch (choice) {
             case 1:
                 clearConsole();
-                handleBuildingMenu();
+                handleBuildingMenu(player);
                 break;
             case 2:
                 clearConsole();
-                handleUnitMenu();
+                handleUnitMenu(player);
                 break;
             case 3:
                 System.out.println("Возврат в игровое меню...");
@@ -37,19 +36,19 @@ public class CastleMenu extends Inter {
         return choice;
     }
 
-    private void handleUnitMenu() {
+    private void handleUnitMenu(HumanPlayer player) {
         int result;
         do {
             buyUnitMenu.display();
-            result = buyUnitMenu.handleInput();
+            result = buyUnitMenu.handleInput(player);
         } while (result != 6);
     }
 
-    private void handleBuildingMenu() {
+    private void handleBuildingMenu(HumanPlayer player) {
         int result;
         do {
             buyBuildingMenu.display();
-            result = buyBuildingMenu.handleInput();
+            result = buyBuildingMenu.handleInput(player);
         } while (result != 8);
     }
 }

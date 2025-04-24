@@ -53,7 +53,7 @@ public class MenuManager {
             switch (choice) {
                 case 1:
                     startMenu.clearConsole();
-                    handleCastleMenu();
+                    handleCastleMenu(hplayer);
                     break;
                 case 3:
                     return true;
@@ -69,11 +69,11 @@ public class MenuManager {
         gameMenu.display();
     }
 
-    private void handleCastleMenu() {
+    private void handleCastleMenu(HumanPlayer player) {
         int result;
         do {
             castleMenu.display();
-            result = castleMenu.handleInput();
+            result = castleMenu.handleInput(player);
         } while (result != 3);
     }
 
