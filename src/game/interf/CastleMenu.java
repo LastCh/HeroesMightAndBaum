@@ -9,10 +9,14 @@ public class CastleMenu extends Inter {
 
     @Override
     public void display() {
-        System.out.println("Меню замка:");
-        System.out.println("1. Улучшить замок");
-        System.out.println("2. Нанять юнитов");
-        System.out.println("3. Вернуться в главное меню");
+        System.out.println("\n" +
+                "  ╔══════════════════════════════════╗\n" +
+                "  ║" + BOLD + PURPLE + "         🏰 МЕНЮ ЗАМКА          " + RESET + "  ║\n" +
+                "  ╠══════════════════════════════════╣\n" +
+                "  ║ " + YELLOW + "1. " + CYAN + "Улучшить замок               " + RESET + " ║\n" +
+                "  ║ " + YELLOW + "2. " + CYAN + "Нанять юнитов                " + RESET + " ║\n" +
+                "  ║ " + YELLOW + "3. " + CYAN + "Вернуться в игровое меню     " + RESET + " ║\n" +
+                "  ╚══════════════════════════════════╝\n");
     }
 
     public int handleInput(HumanPlayer player) {
@@ -21,17 +25,19 @@ public class CastleMenu extends Inter {
         switch (choice) {
             case 1:
                 clearConsole();
+                System.out.println(BOLD + GOLD_COLOR + "💰 Ваше золото: " + player.getGold() + RESET + "\n");
                 handleBuildingMenu(player);
                 break;
             case 2:
                 clearConsole();
+                System.out.println(BOLD + GOLD_COLOR + "💰 Ваше золото: " + player.getGold() + RESET + "\n");
                 handleUnitMenu(player);
                 break;
             case 3:
-                System.out.println("Возврат в игровое меню...");
+                System.out.println(CYAN + "↩️ Возвращение в игровое меню..." + RESET);
                 break;
             default:
-                System.out.println("Неверный выбор. Попробуйте снова.");
+                System.out.println(RED + "❌ Неверный выбор. Попробуйте снова." + RESET);
         }
         return choice;
     }

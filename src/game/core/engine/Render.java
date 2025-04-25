@@ -17,7 +17,8 @@ public class Render {
     private final Castle castlePlayer;
     private final Castle castleBot;
 
-    public Render(Field field, HumanPlayer player, Scanner sharedScanner, ComputerPlayer computer, Castle cb, Castle cp) {
+    public Render(Field field, HumanPlayer player, Scanner sharedScanner,
+                  ComputerPlayer computer, Castle cb, Castle cp) {
         this.field = field;
         this.player = player;
         this.scanner = sharedScanner;
@@ -31,26 +32,37 @@ public class Render {
 
     public void startGameLoop() {
         boolean running = true;
-        System.out.println("Для начала игры купите первое здание в свой замок и наймите юнитов, чтобы ваш герой смог передвигаться!");
+        System.out.println("Для начала игры купите первое здание в свой замок и наймите юнитов," +
+                " чтобы ваш герой смог передвигаться!");
         while (running) {
             renderField();
             menu.callGame();
             String input = scanner.nextLine().trim().toUpperCase();
 
             switch (input) {
-                case "W" -> safeMove(0, -1, 0);
-                case "S" -> safeMove(0, 1, 0);
-                case "A" -> safeMove(-1, 0,0);
-                case "D" -> safeMove(1, 0,0 );
+                case "W" -> {
+                    clearConsole();
+                    player.move(0, -1, field, 0);
+                }
+                case "S" -> {
+                    clearConsole();
+                    player.move(0, 1, field, 0);
+                }
+                case "A" -> {
+                    clearConsole();
+                    player.move(-1, 0, field,0);
+                }
+                case "D" -> {
+                    clearConsole();
+                    player.move(1, 0, field,0 );
+                }
                 case "Q" -> {
-                    while (player.getMovementPoints() > 1) {
-                        safeMove(0, 0, 0);
-                    }
+                    player.resetMovementPoints();
                     if (computerPlayer.isAlive()) {
                         computerPlayer.performAITurn(field, player); // Вызов ИИ
                         computerPlayer.resetMovementPoints(); // Сбрасываем очки ИИ
                     }
-                    player.resetMovementPoints(); // Восстанавливаем очки
+                    clearConsole();
                 }
                 case "M" -> {
                     clearConsole();
@@ -58,10 +70,22 @@ public class Render {
                         return; // Выход в главное меню
                     }
                 }
-                case "SD", "DS" -> safeMove(1, 1, 1);
-                case "AS", "SA" -> safeMove(-1, 1, 1);
-                case "AW", "WA" -> safeMove(-1, -1, 1);
-                case "WD", "DW" -> safeMove(1, -1, 1);
+                case "SD", "DS" -> {
+                    clearConsole();
+                    player.move(1, 1, field, 1);
+                }
+                case "AS", "SA" -> {
+                    clearConsole();
+                    player.move(-1, 1, field, 1);
+                }
+                case "AW", "WA" -> {
+                    clearConsole();
+                    player.move(-1, -1, field, 1);
+                }
+                case "WD", "DW" -> {
+                    clearConsole();
+                    player.move(1, -1, field, 1);
+                }
                 default -> {
                     clearConsole();
                     System.out.println("Неверная команда.");
@@ -84,18 +108,10 @@ public class Render {
         }
     }
 
-    private void safeMove(int dx, int dy, int diag) {
-        clearConsole();
-        try {
-            player.move(dx, dy, field, diag);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Ошибка движения: " + e.getMessage());
-        }
-    }
-
     public void renderField() {
         field.render();
-        menu.getGameMenu().display(player.getMovementPoints(), castlePlayer.getHealth(), castleBot.getHealth());
+        menu.getGameMenu().display(player.getMovementPoints(), castlePlayer.getHealth(),
+                castleBot.getHealth(), player.getGold(), player.getHealth());
     }
 
     private boolean checkCastleCaptured() {

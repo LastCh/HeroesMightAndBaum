@@ -1,7 +1,9 @@
 package game.model.building.incastle;
 
 public class CrossbowmensTower extends BuildingCastle {
-    private int cost = 40;
+    private static final int cost = 40;
+    private static final String name = "башня арбалетчиков";
+
     public CrossbowmensTower() { }
 
     @Override
@@ -9,8 +11,7 @@ public class CrossbowmensTower extends BuildingCastle {
         return cost;
     }
 
-    @Override
-    public void setCost(int cost) {
-        this.cost = cost;
+    public static String getName() {
+        return name;
     }
 }

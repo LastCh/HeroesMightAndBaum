@@ -1,18 +1,17 @@
 package game.model.building.incastle;
 
 public class GuardPost extends BuildingCastle {
-    private int cost = 10;
-    public GuardPost() {
+    private static final int cost = 30;
+    private static final String name = "сторожевой пост";
 
-    }
+    public GuardPost() { }
 
     @Override
     public int getCost() {
         return cost;
     }
 
-    @Override
-    public void setCost(int cost) {
-        this.cost = cost;
+    public static String getName() {
+        return name;
     }
 }

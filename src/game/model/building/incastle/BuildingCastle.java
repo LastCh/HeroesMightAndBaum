@@ -1,7 +1,8 @@
 package game.model.building.incastle;
 
 public abstract class BuildingCastle {
-    protected int cost;
+    protected static int cost;
+    protected static String name;
 
     public BuildingCastle() { }
 
@@ -9,7 +10,7 @@ public abstract class BuildingCastle {
         return cost;
     }
 
-    public void setCost(int cost1) {
-        this.cost = cost1;
+    public static String getName() {
+        return name;
     }
 }

@@ -8,113 +8,132 @@ public class BuyUnitMenu extends Inter {
 
     @Override
     public void display() {
-        System.out.println("Меню покупки юнитов:");
-        System.out.println("1. Купить копейщика (10 золота)");
-        System.out.println("2. Купить арбалетчика (20 золота)");
-        System.out.println("3. Купить мечника (30 золота)");
-        System.out.println("4. Купить кавалериста (40 золота)");
-        System.out.println("5. Купить паладина (50 золота)");
-        System.out.println("6. Вернуться в главное меню");
+        System.out.println("\nМеню покупки юнитов:");
+        System.out.println("1. Купить копейщика (" + GameUnits.SPEARMAN.getCost() +
+                " золота) - требуется " + GameBuildings.GUARD_POST.getName());
+        System.out.println("2. Купить арбалетчика (" + GameUnits.CROSSBOWMAN.getCost() +
+                " золота) - требуется " + GameBuildings.CROSSBOWMENS_TOWER.getName());
+        System.out.println("3. Купить мечника (" + GameUnits.SWORDSMAN.getCost() +
+                " золота) - требуется " + GameBuildings.ARMORY.getName());
+        System.out.println("4. Купить кавалериста (" + GameUnits.CAVALRYMAN.getCost() +
+                " золота) - требуется " + GameBuildings.ARENA.getName());
+        System.out.println("5. Купить паладина (" + GameUnits.PALADIN.getCost() +
+                " золота) - требуется " + GameBuildings.CATHEDRAL.getName());
+        System.out.println("6. Вернуться в меню управления замком\n");
     }
 
     public int handleInput(HumanPlayer player) {
         int choice = super.handleInput();
         clearConsole();
         switch (choice) {
-            case 1:
-                if (!player.haveMoney(10)) {
+            case 1: // Копейщик
+                if (!player.haveMoney(GameUnits.SPEARMAN.getCost())) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
                     System.out.println("Не хватает золота!");
                     break;
                 }
 
-                if(!player.getMyCastle().contains(guardPost)){
-                    System.out.println("У вас нет сторожевого поста для найма копейщика!");
+                if (!player.getMyCastle().contains(GameBuildings.GUARD_POST)) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
+                    System.out.println("У вас отсутствует " + GameBuildings.GUARD_POST.getName() +
+                            " для найма копейщика!");
                     break;
                 }
 
-                player.spendMoney(10);
-                player.addUnits(spearman);
+                player.spendMoney(GameUnits.SPEARMAN.getCost());
+                player.addUnits(GameUnits.SPEARMAN);
+                System.out.println("Ваше золото: " + player.getGold() + "\n");
                 System.out.println("Копейщик куплен!");
                 break;
-            case 2:
-                if (!player.haveMoney(20)) {
+
+            case 2: // Арбалетчик
+                if (!player.haveMoney(GameUnits.CROSSBOWMAN.getCost())) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
                     System.out.println("Не хватает золота!");
                     break;
                 }
 
-                if(!player.getMyCastle().contains(crossbowmensTower)){
-                    System.out.println("У вас нет башни арбалетчиков для найма арбалетчика!");
+                if (!player.getMyCastle().contains(GameBuildings.CROSSBOWMENS_TOWER)) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
+                    System.out.println("У вас отсутствует " + GameBuildings.CROSSBOWMENS_TOWER.getName() +
+                            " для найма арбалетчика!");
                     break;
                 }
 
-                player.spendMoney(20);
-                player.addUnits(crossbowman);
+                player.spendMoney(GameUnits.CROSSBOWMAN.getCost());
+                player.addUnits(GameUnits.CROSSBOWMAN);
+                System.out.println("Ваше золото: " + player.getGold() + "\n");
                 System.out.println("Арбалетчик куплен!");
                 break;
-            case 3:
-                if (!player.haveMoney(30)) {
+
+            case 3: // Мечник
+                if (!player.haveMoney(GameUnits.SWORDSMAN.getCost())) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
                     System.out.println("Не хватает золота!");
                     break;
                 }
 
-                if(!player.getMyCastle().contains(armory)){
-                    System.out.println("У вас нет оружейной для найма мечника!");
+                if (!player.getMyCastle().contains(GameBuildings.ARMORY)) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
+                    System.out.println("У вас отсутствует " + GameBuildings.ARMORY.getName() +
+                            " для найма мечника!");
                     break;
                 }
 
-                player.spendMoney(30);
-                player.addUnits(swordsman);
+                player.spendMoney(GameUnits.SWORDSMAN.getCost());
+                player.addUnits(GameUnits.SWORDSMAN);
+                System.out.println("Ваше золото: " + player.getGold() + "\n");
                 System.out.println("Мечник куплен!");
                 break;
-            case 4:
-                if (!player.haveMoney(40)) {
+
+            case 4: // Кавалерист
+                if (!player.haveMoney(GameUnits.CAVALRYMAN.getCost())) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
                     System.out.println("Не хватает золота!");
                     break;
                 }
 
-                if(!player.getMyCastle().contains(arena)){
-                    System.out.println("У вас нет арены для найма кавалеристов!");
+                if (!player.getMyCastle().contains(GameBuildings.ARENA)) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
+                    System.out.println("У вас отсутствует " + GameBuildings.ARENA.getName() +
+                            " для найма кавалериста!");
                     break;
                 }
 
-                player.spendMoney(40);
-                player.addUnits(cavalryman);
+                player.spendMoney(GameUnits.CAVALRYMAN.getCost());
+                player.addUnits(GameUnits.CAVALRYMAN);
+                System.out.println("Ваше золото: " + player.getGold() + "\n");
                 System.out.println("Кавалерист куплен!");
                 break;
-            case 5:
-                if (!player.haveMoney(50)) {
+
+            case 5: // Паладин
+                if (!player.haveMoney(GameUnits.PALADIN.getCost())) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
                     System.out.println("Не хватает золота!");
                     break;
                 }
 
-                if(!player.getMyCastle().contains(cathedral)){
-                    System.out.println("У вас нет Собора для найма паладина!");
+                if (!player.getMyCastle().contains(GameBuildings.CATHEDRAL)) {
+                    System.out.println("Ваше золото: " + player.getGold() + "\n");
+                    System.out.println("У вас отсутствует " + GameBuildings.CATHEDRAL.getName() +
+                            " для найма паладина!");
                     break;
                 }
 
-                player.spendMoney(50);
-                player.addUnits(paladin);
+                player.spendMoney(GameUnits.PALADIN.getCost());
+                player.addUnits(GameUnits.PALADIN);
+                System.out.println("Ваше золото: " + player.getGold() + "\n");
                 System.out.println("Паладин куплен!");
                 break;
+
             case 6:
                 System.out.println("Возврат в игровое меню...");
                 break;
+
             default:
+                System.out.println("Ваше золото: " + player.getGold() + "\n");
                 System.out.println("Неверный выбор. Попробуйте снова.");
         }
         return choice;
     }
-
-    private Cavalryman cavalryman;
-    private Paladin paladin;
-    private Swordsman swordsman;
-    private Crossbowman crossbowman;
-    private Spearman spearman;
-    private GuardPost guardPost;
-    private Tavern tavern;
-    private Stable stable;
-    private CrossbowmensTower crossbowmensTower;
-    private Armory armory;
-    private Arena arena;
-    private Cathedral cathedral;
 }

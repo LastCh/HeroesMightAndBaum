@@ -1,7 +1,9 @@
 package game.model.building.incastle;
 
 public class Tavern extends BuildingCastle {
-    private int cost = 10;
+    private static final int cost = 10;
+    private static final String name = "таверна";
+
     public Tavern() {}
 
     @Override
@@ -9,8 +11,7 @@ public class Tavern extends BuildingCastle {
         return cost;
     }
 
-    @Override
-    public void setCost(int cost) {
-        this.cost = cost;
+    public static String getName() {
+        return name;
     }
 }

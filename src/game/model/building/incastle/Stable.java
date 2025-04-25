@@ -1,17 +1,17 @@
 package game.model.building.incastle;
 
 public class Stable extends BuildingCastle {
-    private int cost = 20;
-    public Stable(){
-    }
+    private static final int cost = 20;
+    private static final String name = "конюшня";
+
+    public Stable(){ }
 
     @Override
     public int getCost() {
         return cost;
     }
 
-    @Override
-    public void setCost(int cost) {
-        this.cost = cost;
+    public static String getName() {
+        return name;
     }
 }

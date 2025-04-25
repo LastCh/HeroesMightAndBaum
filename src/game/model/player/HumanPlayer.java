@@ -74,7 +74,7 @@ public class HumanPlayer extends Player {
         accumulatedMovementCoef =newAccumulatedMovementCoef - (int)newAccumulatedMovementCoef;
         int finalCost = movementPoints - cost;
         spendMovementPoints(finalCost);
-        System.out.println("Вы переместились на: " + newPos);
+        if(!(dx == 0 || dy == 0)){System.out.println("Вы переместились на: " + newPos);}
         diag = newDiag;
         field.moveObject(this, this.position.x(), this.position.y(), newPos.x(), newPos.y());
         this.position = newPos;

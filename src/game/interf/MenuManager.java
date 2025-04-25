@@ -40,13 +40,24 @@ public class MenuManager {
     }
 
     public boolean showGameMenu() {
-        int choice;
+        // ANSI коды цветов
+        final String RESET = "\u001B[0m";
+        final String CYAN = "\u001B[36m";
+        final String YELLOW = "\u001B[33m";
+        final String PURPLE = "\u001B[35m";
+        final String BOLD = "\u001B[1m";
+        final String RED = "\u001B[31m";
 
+        int choice;
         do {
-            System.out.println("Игровое меню:");
-            System.out.println("1. Управление замком");
-            System.out.println("2. Вернуться в игру");
-            System.out.println("3. Вернуться в главное меню");
+            System.out.println("\n" +
+                    "  ╔══════════════════════════════════╗\n" +
+                    "  ║" + BOLD + PURPLE + "         🏰 ИГРОВОЕ МЕНЮ          " + RESET + "║\n" +
+                    "  ╠══════════════════════════════════╣\n" +
+                    "  ║ " + YELLOW + "1. " + CYAN + "Управление замком             " + RESET + "║\n" +
+                    "  ║ " + YELLOW + "2. " + CYAN + "Вернуться в игру              " + RESET + "║\n" +
+                    "  ║ " + YELLOW + "3. " + CYAN + "Главное меню                  " + RESET + "║\n" +
+                    "  ╚══════════════════════════════════╝\n");
 
             choice = startMenu.handleInput();
 
@@ -59,7 +70,9 @@ public class MenuManager {
                     return true;
                 default:
                     startMenu.clearConsole();
-                    System.out.println("Неверный выбор. Попробуйте снова.");
+                    if (choice != 2) {
+                        System.out.println("\n" + RED + "  ❌ Неверный выбор. Попробуйте снова." + RESET);
+                    }
             }
         } while (choice != 2);
         return false;
