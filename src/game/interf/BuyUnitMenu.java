@@ -57,8 +57,7 @@ public class BuyUnitMenu extends Inter {
                 }
 
                 player.spendMoney(GameUnits.SPEARMAN.getCost());
-                player.addUnits(GameUnits.SPEARMAN);
-                player.setPower(player.getPower()+ GameUnits.SPEARMAN.getPower());
+                player.addUnits(GameUnits.SPEARMAN.clone());
                 showGold.run();
                 System.out.println(GREEN + "🛡️ Копейщик нанят в вашу армию!" + RESET);
                 break;
@@ -77,8 +76,7 @@ public class BuyUnitMenu extends Inter {
                 }
 
                 player.spendMoney(GameUnits.CROSSBOWMAN.getCost());
-                player.addUnits(GameUnits.CROSSBOWMAN);
-                player.setPower(player.getPower()+ GameUnits.CROSSBOWMAN.getPower());
+                player.addUnits(GameUnits.CROSSBOWMAN.clone());
                 showGold.run();
                 System.out.println(GREEN + "🏹 Арбалетчик присоединился к отряду!" + RESET);
                 break;
@@ -97,8 +95,7 @@ public class BuyUnitMenu extends Inter {
                 }
 
                 player.spendMoney(GameUnits.SWORDSMAN.getCost());
-                player.addUnits(GameUnits.SWORDSMAN);
-                player.setPower(player.getPower()+ GameUnits.SWORDSMAN.getPower());
+                player.addUnits(GameUnits.SWORDSMAN.clone());
                 showGold.run();
                 System.out.println(GREEN + "⚔️ Мечник готов к бою!" + RESET);
                 break;
@@ -117,8 +114,7 @@ public class BuyUnitMenu extends Inter {
                 }
 
                 player.spendMoney(GameUnits.CAVALRYMAN.getCost());
-                player.addUnits(GameUnits.CAVALRYMAN);
-                player.setPower(player.getPower()+ GameUnits.CAVALRYMAN.getPower());
+                player.addUnits(GameUnits.CAVALRYMAN.clone());
                 showGold.run();
                 System.out.println(GREEN + "🐎 Кавалерия пополнена новым бойцом!" + RESET);
                 break;
@@ -137,8 +133,7 @@ public class BuyUnitMenu extends Inter {
                 }
 
                 player.spendMoney(GameUnits.PALADIN.getCost());
-                player.addUnits(GameUnits.PALADIN);
-                player.setPower(player.getPower()+ GameUnits.PALADIN.getPower());
+                player.addUnits(GameUnits.PALADIN.clone());
                 showGold.run();
                 System.out.println(GREEN + "✨ Паладин освятил ваши ряды!" + RESET);
                 break;

@@ -1,17 +1,13 @@
 package game.model.unit;
 
 public class Spearman extends Unit {
-    private final double distanceModify = 1.1;
-    private final double powerModify = 1.2;
-    private static final int cost = 10;
-
-    public Spearman() { }
-
-    public int getCost() {
-        return cost;
+    public Spearman() {
+        this.power = 11;
+        this.cost = 10;
     }
 
-    public int getPower() {
-        return (int)(10*powerModify);
+    @Override
+    public Spearman clone() {
+        return new Spearman(); // Т.к. он без состояния, просто новый объект
     }
 }

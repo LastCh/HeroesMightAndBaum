@@ -5,7 +5,7 @@ public class GameMenu extends Inter {
     public void display() {
         System.out.println("🎮 Управление:");
         System.out.println("⬆️ [W] - Вверх  |  ⬇️ [S] - Вниз  |  ⬅️ [A] - Влево" +
-                "  |  ➡️ [D] - Вправо  |  📜 [M] - Меню  |  ⏭️ [Q] - Пропуск хода");
+                "  |  ➡️ [D] - Вправо  |  📜 [M] - Меню  |  ⏭️ [Q] - Пропуск хода  |  🪄 [X] - Использовать артефакт");
     }
 
     public void display(int points, int castleHealth, int enemyCastleHealth, int money, int hp, int power) {

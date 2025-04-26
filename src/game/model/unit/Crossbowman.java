@@ -1,17 +1,13 @@
 package game.model.unit;
 
 public class Crossbowman extends Unit {
-    private final double distanceModify = 1.3;
-    private final double powerModify = 1.2;
-    private static final int cost = 20;
-
-    public Crossbowman() { }
-
-    public int getCost() {
-        return cost;
+    public Crossbowman() {
+        this.power = 12;
+        this.cost = 20;
     }
 
-    public int getPower() {
-        return (int)(10*powerModify);
+    @Override
+    public Crossbowman clone() {
+        return new Crossbowman();
     }
 }

@@ -5,7 +5,7 @@ import game.model.hero.HumanHero;
 public class CastleMenu extends Inter {
     private final BuyBuildingMenu buyBuildingMenu = new BuyBuildingMenu();
     private final BuyUnitMenu buyUnitMenu = new BuyUnitMenu();
-
+    private final BuyHeroesMenu buyHeroesMenu = new BuyHeroesMenu();
 
     @Override
     public void display() {
@@ -37,7 +37,7 @@ public class CastleMenu extends Inter {
             case 3:
                 clearConsole();
                 System.out.println(BOLD + GOLD_COLOR + "💰 Ваше золото: " + player.getGold() + RESET + "\n");
-                handleUnitMenu(player);
+                handleHeroesMenu(player);
                 break;
             case 4:
                 System.out.println(CYAN + "↩️ Возвращение в игровое меню..." + RESET);
@@ -59,9 +59,9 @@ public class CastleMenu extends Inter {
     private void handleHeroesMenu(HumanHero player) {
         int result;
         do {
-            buyUnitMenu.display();
-            result = buyUnitMenu.handleInput(player);
-        } while (result != 6);
+            buyHeroesMenu.display();
+            result = buyHeroesMenu.handleInput(player);
+        } while (result != 4);
     }
 
     private void handleBuildingMenu(HumanHero player) {

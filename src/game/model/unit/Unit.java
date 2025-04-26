@@ -1,17 +1,23 @@
 package game.model.unit;
 
-public abstract class Unit {
-    protected static int cost;
-    protected float powerModify;
-    protected float distanceModify;
+public abstract class Unit implements CloneableUnit {
+    protected int power;
+    protected int cost;
 
-    public Unit() { }
+    public int getPower() {
+        return power;
+    }
 
     public int getCost() {
         return cost;
     }
 
-    public int getPower() {
-        return (int)(10*powerModify);
+    @Override
+    public Unit clone() {
+        try {
+            return (Unit) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Клонирование не поддерживается", e);
+        }
     }
 }

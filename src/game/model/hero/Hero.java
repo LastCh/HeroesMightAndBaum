@@ -22,6 +22,7 @@ public abstract class Hero extends FieldObject implements Movable {
     protected int gold;
     protected double accumulatedMovementCoef = 0.0;
     protected boolean speedStableBonus = false;
+    protected Castle castle;
 
     public Hero(Position startPosition, Direction startDirection, String colorCode, Castle castle,
                 int priority, int points, int gold) {
@@ -124,9 +125,10 @@ public abstract class Hero extends FieldObject implements Movable {
                 ((movementPoints > 1) && (oldDiag == 0)));
     }
 
-    // Новый абстрактный метод — поведение героя
-    public abstract void makeMove(Field field);
-
+    public void addUnits(Unit unit) {
+        this.units.add(unit);
+        this.power += unit.getPower(); // Обновляем силу
+    }
 
     public void setGold(int count) {
         this.gold = count;
@@ -211,15 +213,22 @@ public abstract class Hero extends FieldObject implements Movable {
         this.units = uni;
     }
 
-    public void addUnits(Unit unit) {
-        this.units.add(unit);
-    }
-
     public boolean noHaveMoney(int cost) {
         return !(this.gold >= cost);
     }
 
+    public void addGold(int money) {
+        gold += money;
+    }
+
     public void spendMoney(int cost) {
         gold -= cost;
+    }
+
+    public Field getField() {
+        return castle.getField(); // Предполагается, что Castle имеет поле типа Field
+    }
+
+    public void makeMove(Field field) {
     }
 }

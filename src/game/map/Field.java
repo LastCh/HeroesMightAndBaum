@@ -6,11 +6,18 @@ import game.model.building.onmap.Castle;
 import game.model.hero.ComputerHero;
 import game.model.hero.HumanHero;
 import game.model.hero.Hero;
+import game.model.hero.PurchasableHero;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 public class Field {
     private final int width;
     private final int height;
     private final Cell[][] grid;
+    private final List<PurchasableHero> allHeroes = new ArrayList<>();
 
     public Field(int width, int height) {
         this.width = width;
@@ -22,6 +29,14 @@ public class Field {
                 grid[x][y] = new Cell();
             }
         }
+    }
+
+    public List<PurchasableHero> getAllHeroes() {
+        return allHeroes;
+    }
+
+    public void addHeroToAll(PurchasableHero newHero) {
+        allHeroes.add(newHero);
     }
 
     public int getWidth() {
@@ -95,6 +110,18 @@ public class Field {
         return null;
     }
 
+    public Hero getEnemyHeroAt(Position pos) {
+        Cell cell = getCell(pos.x(), pos.y());
+        if (cell != null) {
+            for (FieldObject obj : cell.getObjects()) {
+                if (obj instanceof Hero) {
+                    return (Hero) obj;
+                }
+            }
+        }
+        return null;
+    }
+
     public HumanHero getHumanHeroAt(Position pos) {
         Cell cell = getCell(pos.x(), pos.y());
         if (cell != null) {
@@ -130,6 +157,96 @@ public class Field {
             }
         }
     }
+
+    public Castle getNearestEnemyCastle(Hero hero) {
+        Position start = hero.getPosition();
+        boolean[][] visited = new boolean[width][height];
+        Queue<Position> queue = new LinkedList<>();
+        queue.add(start);
+        visited[start.x()][start.y()] = true;
+
+        while (!queue.isEmpty()) {
+            Position pos = queue.poll();
+            Castle castle = getCastleAt(pos);
+            if (castle != null && !castle.equals(hero.getMyCastle())) { // Не своя крепость
+                return castle;
+            }
+
+            for (Position neighbor : getNeighbors(pos)) {
+                if (!visited[neighbor.x()][neighbor.y()]) {
+                    visited[neighbor.x()][neighbor.y()] = true;
+                    queue.add(neighbor);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Hero getNearestEnemyHero(Hero hero) {
+        Position start = hero.getPosition();
+        boolean[][] visited = new boolean[width][height];
+        Queue<Position> queue = new LinkedList<>();
+        queue.add(start);
+        visited[start.x()][start.y()] = true;
+
+        while (!queue.isEmpty()) {
+            Position pos = queue.poll();
+            Hero other = getHeroAt(pos);
+            if (other != null && !isAlly(hero, other)) { // Если это чужой герой
+                return other;
+            }
+
+            for (Position neighbor : getNeighbors(pos)) {
+                if (!visited[neighbor.x()][neighbor.y()]) {
+                    visited[neighbor.x()][neighbor.y()] = true;
+                    queue.add(neighbor);
+                }
+            }
+        }
+        return null;
+    }
+
+    // Вспомогательный метод — соседние клетки
+    private List<Position> getNeighbors(Position pos) {
+        List<Position> neighbors = new ArrayList<>();
+        int[] dx = {-1, 1, 0, 0};
+        int[] dy = {0, 0, -1, 1};
+
+        for (int i = 0; i < 4; i++) {
+            int nx = pos.x() + dx[i];
+            int ny = pos.y() + dy[i];
+
+            if (nx >= 0 && ny >= 0 && nx < width && ny < height) {
+                neighbors.add(new Position(nx, ny));
+            }
+        }
+        return neighbors;
+    }
+
+    // Проверка союзников
+    private boolean isAlly(Hero a, Hero b) {
+        if (a == b) return true;
+        if (a instanceof PurchasableHero pHero && pHero.getOwner() == b) return true;
+        if (b instanceof PurchasableHero pHero && pHero.getOwner() == a) return true;
+        if (a instanceof PurchasableHero pA && b instanceof PurchasableHero pB && pA.getOwner() == pB.getOwner()) return true;
+        return false;
+    }
+
+    public Position findFreeAdjacent(Position center) {
+        int[] dx = {-1, 0, 1, 0};
+        int[] dy = {0, -1, 0, 1};
+
+        for (int i = 0; i < 4; i++) {
+            int nx = center.x() + dx[i];
+            int ny = center.y() + dy[i];
+            Cell cell = getCell(nx, ny);
+            if (cell != null) {
+                return new Position(nx, ny);
+            }
+        }
+        return null;
+    }
+
 
     public Cell[][] getGrid() {
         return grid;

@@ -22,6 +22,10 @@ public class Cell {
         this.terrainType = terrainType;
     }
 
+    public boolean isEmpty() {
+        return objects.isEmpty();
+    }
+
     public TerrainType getTerrainType() {
         return terrainType;
     }

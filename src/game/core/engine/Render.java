@@ -1,11 +1,15 @@
 package game.core.engine;
 
+import game.api.Position;
 import game.interf.MenuManager;
 import game.map.Field;
 import game.model.building.onmap.Castle;
 import game.model.hero.ComputerHero;
+import game.model.hero.Hero;
 import game.model.hero.HumanHero;
+import game.model.hero.PurchasableHero;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Render {
@@ -58,15 +62,47 @@ public class Render {
                 case "Q" -> {
                     player.resetMovementPoints();
                     if (computerPlayer.isAlive()) {
-                        computerPlayer.performAITurn(field, player); // Вызов ИИ
-                        computerPlayer.resetMovementPoints(); // Сбрасываем очки ИИ
+                        computerPlayer.makeMove(field); // Новый вызов хода ИИ
+                        computerPlayer.resetMovementPoints();
+                        computerPlayer.addGold(200);
                     }
+                    player.addGold(200);
+                    moveAllHeroes();
                     clearConsole();
                 }
                 case "M" -> {
                     clearConsole();
                     if (menu.showGameMenu()) {
                         return; // Выход в главное меню
+                    }
+                }
+                case "X" -> {
+                    clearConsole();
+                    if (!player.hasArtifact()) {
+                        System.out.println("У вас нет артефакта для использования!");
+                        break;
+                    }
+                    try {
+                        System.out.println("Укажите координаты цели для артефакта:");
+                        System.out.print("X: ");
+                        int x = scanner.nextInt();
+                        System.out.print("Y: ");
+                        int y = scanner.nextInt();
+                        scanner.nextLine(); // Очистка сканнера после чисел
+
+                        Position position = new Position(x, y);
+                        Hero enemy = field.getHeroAt(position);
+
+                        if (enemy != null && enemy != player) {
+                            if (player.useArtifact(enemy)) {
+                                field.removePlayer(enemy);
+                            }
+                        } else {
+                            System.out.println("На этих координатах нет подходящей цели.");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Ошибка ввода! Пожалуйста, введите корректные координаты.");
+                        scanner.nextLine(); // Очистка сканнера в случае ошибки
                     }
                 }
                 case "SD", "DS" -> {
@@ -103,6 +139,20 @@ public class Render {
 
             if (!computerPlayer.isAlive()) {
                 field.removePlayer(computerPlayer);
+            }
+        }
+    }
+
+    private void moveAllHeroes() {
+        // Получаем список всех героев на поле
+        List<PurchasableHero> heroes = field.getAllHeroes();
+
+        // Делаем ход для каждого героя
+        for (PurchasableHero hero : heroes) {
+            if (hero.isAlive()) {
+                hero.makeMove(field);  // Пусть каждый герой сделает свой ход
+            }else{
+                field.removePlayer(hero);
             }
         }
     }
