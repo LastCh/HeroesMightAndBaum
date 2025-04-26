@@ -4,7 +4,7 @@ public abstract class BuildingCastle {
     protected static int cost;
     protected static String name;
 
-    public BuildingCastle() { }
+    public BuildingCastle() {}
 
     public int getCost() {
         return cost;

@@ -77,7 +77,7 @@ public class Render {
                     }
                 }
                 case "X" -> {
-                    clearConsole();
+                    System.out.println("\n");
                     if (!player.hasArtifact()) {
                         System.out.println("У вас нет артефакта для использования!");
                         break;

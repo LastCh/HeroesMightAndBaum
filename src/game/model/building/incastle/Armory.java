@@ -4,7 +4,7 @@ public class Armory extends BuildingCastle {
     private static final int cost = 50;
     private static final String name = "оружейная";
 
-    public Armory() { }
+    public Armory() {}
 
     @Override
     public int getCost() {

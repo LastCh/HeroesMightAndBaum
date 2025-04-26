@@ -1,7 +1,6 @@
 package game.model.monster;
 
 import game.api.Position;
-import game.model.building.onmap.Castle;
 import game.model.hero.Hero;
 
 public class Zombie extends Hero {

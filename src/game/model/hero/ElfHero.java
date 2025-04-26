@@ -2,7 +2,6 @@ package game.model.hero;
 
 import game.api.Direction;
 import game.api.Position;
-import game.map.Field;
 import game.model.building.onmap.Castle;
 
 public class ElfHero extends PurchasableHero {

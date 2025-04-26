@@ -50,13 +50,4 @@ public class Cell {
         return String.format("%-3s", symbol); // Фиксированная ширина в 3 символа
     }
 
-    /**
-     * Проверяет, есть ли на клетке объект определенного типа.
-     *
-     * @param type класс объекта, который нужно проверить.
-     * @return true, если объект найден, иначе false.
-     */
-    public boolean hasObjectOfType(Class<?> type) {
-        return objects.stream().anyMatch(type::isInstance);
-    }
 }

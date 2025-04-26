@@ -50,4 +50,24 @@ public class GameManager {
         Render render = new Render(field, human, scanner, computer, botCastle, playerCastle);
         render.startGameLoop();
     }
+
+    public Castle getBotCastle() {
+        return botCastle;
+    }
+
+    public Castle getPlayerCastle() {
+        return playerCastle;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public HumanHero getHumanHero() {
+        return human;
+    }
+
+    public ComputerHero getComputerHero() {
+        return computer;
+    }
 }

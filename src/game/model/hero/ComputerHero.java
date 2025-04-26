@@ -137,7 +137,7 @@ public class ComputerHero extends Hero {
         Position before = getPosition();
         int beforePoints = getMovementPoints();
 
-        move(dx, dy, field, d); // Используем твой метод с полной логикой
+        move(dx, dy, field, d);
 
         // Если позиция не изменилась — значит, перемещение не удалось
         boolean moved = !getPosition().equals(before);
@@ -151,6 +151,5 @@ public class ComputerHero extends Hero {
 
     @Override
     public void interact(Hero player) {
-        // Можно расширить позже
     }
 }

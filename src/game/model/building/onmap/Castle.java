@@ -6,7 +6,6 @@ import game.api.FieldObject;
 import game.map.Field;
 import game.model.building.incastle.BuildingCastle;
 import game.model.hero.Hero;
-import game.model.hero.HumanHero;
 
 import java.util.ArrayList;
 import java.util.Scanner;

@@ -31,10 +31,11 @@ public class HeroTest {
     @BeforeEach
     void setUp() {
         // Создаем сканер для конструктора Castle
-        Scanner scanner = new Scanner(System.in);
-        castle = new Castle(new Position(0, 0), scanner, 0); // Используем правильный конструктор
-        player = new TestHero(new Position(2, 2), Direction.UP, "RED", castle);
         field = new Field(10, 10);
+        Scanner scanner = new Scanner(System.in);
+        castle = new Castle(new Position(0, 0), scanner, 0, field); // Используем правильный конструктор
+        player = new TestHero(new Position(2, 2), Direction.UP, "RED", castle);
+
     }
 
     @Test

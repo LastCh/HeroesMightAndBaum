@@ -7,37 +7,27 @@ import game.model.monster.Zombie;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Random;
 
-public class DungeonField {
+
+public class DungeonField extends Field {
     private final List<Zombie> zombies = new ArrayList<>();
     private final Scanner scanner = new Scanner(System.in);
 
-    public DungeonField() {
-        // Простая генерация зомби
+    public DungeonField(int width, int height) {
+        super(width, height);
+    }
+
+    public void AddZombies() {
         for (int i = 0; i < 3; i++) {
-            zombies.add(new Zombie(new Position(i, 0), 100));
-
+            Random random1 = new Random();
+            Random random2 = new Random();
+            int min = 1;
+            int max = 4;
+            int randomNumber1 = random1.nextInt(max - min + 1) + min;
+            int randomNumber2 = random2.nextInt(max - min + 1) + min;
+            this.getCell(randomNumber1, randomNumber2).addObject(new Zombie(new Position(randomNumber1, randomNumber2), 100));
         }
     }
 
-    public boolean enter(Hero hero) {
-        while (!zombies.isEmpty() && hero.isAlive()) {
-            Zombie target = zombies.get(0);
-            System.out.println("На вас нападает зомби с " + target.getHealth() + " HP!");
-
-            System.out.println("Нажмите Enter чтобы атаковать...");
-            scanner.nextLine();
-
-            hero.attack(target);
-            if (!target.isAlive()) {
-                zombies.remove(target);
-                System.out.println("Зомби побежден!");
-            } else {
-                target.attack(hero);
-                System.out.println("Зомби атакует в ответ!");
-            }
-        }
-
-        return hero.isAlive();
-    }
 }

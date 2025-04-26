@@ -4,7 +4,7 @@ public class CrossbowmensTower extends BuildingCastle {
     private static final int cost = 40;
     private static final String name = "башня арбалетчиков";
 
-    public CrossbowmensTower() { }
+    public CrossbowmensTower() {}
 
     @Override
     public int getCost() {

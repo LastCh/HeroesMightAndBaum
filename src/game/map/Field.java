@@ -3,6 +3,7 @@ package game.map;
 import game.api.FieldObject;
 import game.api.Position;
 import game.model.building.onmap.Castle;
+import game.model.building.onmap.GoldCave;
 import game.model.hero.ComputerHero;
 import game.model.hero.HumanHero;
 import game.model.hero.Hero;
@@ -158,28 +159,16 @@ public class Field {
         }
     }
 
-    public Castle getNearestEnemyCastle(Hero hero) {
-        Position start = hero.getPosition();
-        boolean[][] visited = new boolean[width][height];
-        Queue<Position> queue = new LinkedList<>();
-        queue.add(start);
-        visited[start.x()][start.y()] = true;
-
-        while (!queue.isEmpty()) {
-            Position pos = queue.poll();
-            Castle castle = getCastleAt(pos);
-            if (castle != null && !castle.equals(hero.getMyCastle())) { // Не своя крепость
-                return castle;
-            }
-
-            for (Position neighbor : getNeighbors(pos)) {
-                if (!visited[neighbor.x()][neighbor.y()]) {
-                    visited[neighbor.x()][neighbor.y()] = true;
-                    queue.add(neighbor);
+    public void removeCave(GoldCave cave) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Cell cell = grid[x][y];
+                if (cell.contains(cave)) {
+                    cell.removeObject(cave);
+                    return;
                 }
             }
         }
-        return null;
     }
 
     public Hero getNearestEnemyHero(Hero hero) {
@@ -204,6 +193,22 @@ public class Field {
             }
         }
         return null;
+    }
+
+    // Новый метод для получения всех золотых пещер
+    public List<GoldCave> getGoldCaves() {
+        List<GoldCave> goldCaves = new ArrayList<>();
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Cell cell = grid[x][y];
+                for (FieldObject obj : cell.getObjects()) {
+                    if (obj instanceof GoldCave) {
+                        goldCaves.add((GoldCave) obj);
+                    }
+                }
+            }
+        }
+        return goldCaves;
     }
 
     // Вспомогательный метод — соседние клетки
@@ -247,8 +252,4 @@ public class Field {
         return null;
     }
 
-
-    public Cell[][] getGrid() {
-        return grid;
-    }
 }

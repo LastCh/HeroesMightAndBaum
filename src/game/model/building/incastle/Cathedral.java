@@ -4,7 +4,7 @@ public class Cathedral extends BuildingCastle {
     private static final int cost = 70;
     private static final String name = "собор";
 
-    public Cathedral() { }
+    public Cathedral() {}
 
     @Override
     public int getCost() {

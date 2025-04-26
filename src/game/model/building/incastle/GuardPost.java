@@ -4,7 +4,7 @@ public class GuardPost extends BuildingCastle {
     private static final int cost = 30;
     private static final String name = "сторожевой пост";
 
-    public GuardPost() { }
+    public GuardPost() {}
 
     @Override
     public int getCost() {

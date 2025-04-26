@@ -7,6 +7,7 @@ import game.map.Field;
 import game.model.building.incastle.GameBuildings;
 import game.model.building.onmap.Castle;
 import game.model.building.onmap.GoldCave;
+import game.model.item.MagicalArtifact;
 import game.model.monster.Zombie;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 public class HumanHero extends Hero {
     private static final String COLOR = "\u001B[34m";
     boolean speedStableBonus = false;
-    private boolean hasArtifact = false;
+    private MagicalArtifact magicalArtifact;
 
     public HumanHero(Position startPosition, int points, Castle castle, int gold) {
         super(startPosition, Direction.UP, COLOR, castle, 10, points, gold);
@@ -101,6 +102,7 @@ public class HumanHero extends Hero {
         if (cave != null && !cave.isInCave()) {
             System.out.println("Вы нашли Золотую пещеру и заходите внутрь!");
             cave.interact(this); // Взаимодействие с пещерой
+            field.removeCave(cave);
         }
     }
 
@@ -136,7 +138,6 @@ public class HumanHero extends Hero {
 
     @Override
     public void makeMove(Field field) {
-        // Люди сами управляют своим героем, ничего делать не нужно
     }
 
     public boolean isValidPosition(Position newPos) {
@@ -150,15 +151,22 @@ public class HumanHero extends Hero {
     }
 
     public void receiveArtifact() {
-        this.hasArtifact = true;
+        if(magicalArtifact == null) {
+            this.magicalArtifact = new MagicalArtifact(1,this);
+        }else{
+            magicalArtifact.addArtifact(1);
+        }
     }
 
     public boolean useArtifact(Hero target) {
-        if (!hasArtifact) {
+        if (magicalArtifact == null || magicalArtifact.getAmount() <= 0) {
             System.out.println("У вас нет артефакта!");
             return false;
         }
-        hasArtifact = false;
+        magicalArtifact.spendArtifact();
+        if(magicalArtifact.getAmount() == 0) {
+            magicalArtifact = null;
+        }
         target.takeDamage(target.getHealth());
         System.out.println("💥 Артефакт активирован! Враг уничтожен.");
         return true;
@@ -204,7 +212,11 @@ public class HumanHero extends Hero {
     }
 
     public boolean hasArtifact() {
-        return hasArtifact;
+        if (magicalArtifact == null || magicalArtifact.getAmount() <= 0) {
+            return false;
+        }else {
+            return true;
+        }
     }
 
 }

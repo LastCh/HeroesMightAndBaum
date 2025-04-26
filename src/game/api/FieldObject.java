@@ -2,7 +2,7 @@ package game.api;
 
 import game.model.hero.Hero;
 
-public abstract class FieldObject implements GameObject {
+public abstract class FieldObject {
     protected Position position;
     protected String coloredSymbol;
     protected int priority;

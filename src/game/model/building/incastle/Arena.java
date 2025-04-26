@@ -4,8 +4,7 @@ public class Arena extends BuildingCastle {
     private static final int cost = 60;
     private static final String name = "арена";
 
-    public Arena() {
-    }
+    public Arena() {}
 
     @Override
     public int getCost() {

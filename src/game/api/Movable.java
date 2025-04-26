@@ -2,7 +2,7 @@ package game.api;
 
 import game.map.Field;
 
-public interface Movable extends GameObject {
+public interface Movable {
     // Перемещение объекта
     void move(int dx, int dy, Field field);
 
@@ -15,6 +15,4 @@ public interface Movable extends GameObject {
     // Получение текущего направления
     Direction getDirection();
 
-    // Символ для отрисовки в консоли
-    String getColoredSymbol();
 }

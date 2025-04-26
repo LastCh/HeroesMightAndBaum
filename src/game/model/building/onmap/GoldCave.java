@@ -3,18 +3,17 @@ package game.model.building.onmap;
 import game.api.FieldObject;
 import game.api.Immovable;
 import game.api.Position;
-import game.map.Field;
+import game.map.DungeonField;
 import game.model.hero.HumanHero;
 import game.model.monster.Zombie;
 import game.model.hero.Hero;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class GoldCave extends FieldObject implements Immovable {
     private final int goldAmount;
     private boolean completed = false;
-    private final Field caveField;
+    private DungeonField dungeonField;
     private boolean inCave = false;
     private final Scanner scanner = new Scanner(System.in);
     private final Position caveEntry = new Position(0, 0);
@@ -22,12 +21,15 @@ public class GoldCave extends FieldObject implements Immovable {
     public GoldCave(Position position, int goldAmount) {
         super(position, "\u001B[33m" + "\u001B[41m" + "💰" + "\u001B[0m", 4);
         this.goldAmount = goldAmount;
+        int min = 1;
+        int max = 500;
+        int randomNumber = (int)(Math.random() * (max - min + 1)) + min;
+        goldAmount = randomNumber;
 
         // Создаем мини-подземелье 5x5
-        caveField = new Field(5, 5);
-        for (int i = 0; i < 3; i++) {
-            caveField.getCell(1 + i, 1).addObject(new Zombie(new Position(1 + i, 1), 100));
-        }
+        dungeonField = new DungeonField(5, 5);
+        dungeonField.AddZombies();
+
     }
 
     @Override
@@ -41,12 +43,12 @@ public class GoldCave extends FieldObject implements Immovable {
 
         System.out.println("Игрок входит в Золотую пещеру!");
         player.setPosition(caveEntry);
-        caveField.getCell(caveEntry.x(), caveEntry.y()).addObject(player);
+        dungeonField.getCell(caveEntry.x(), caveEntry.y()).addObject(player);
         inCave = true;
 
         while (true) {
             clearConsole();
-            caveField.render();
+            dungeonField.render();
             System.out.println("Вы находитесь в клетке: " + player.getPosition());
             System.out.println("Выберите действие:");
             System.out.println("[W] Вверх");
@@ -59,7 +61,7 @@ public class GoldCave extends FieldObject implements Immovable {
 
             switch (input) {
                 case "W" -> {
-                    player.moveInCave(0, -1, caveField);
+                    player.moveInCave(0, -1, dungeonField);
                     if (areAllZombiesDead()) {
                         System.out.println("Вы победили всех зомби и получаете артефакт!");
                         player.receiveArtifact();
@@ -69,7 +71,7 @@ public class GoldCave extends FieldObject implements Immovable {
                     }
                 }
                 case "S" ->{
-                    player.moveInCave(0, 1, caveField);
+                    player.moveInCave(0, 1, dungeonField);
                     if (areAllZombiesDead()) {
                         System.out.println("Вы победили всех зомби и получаете артефакт!");
                         player.receiveArtifact();
@@ -79,7 +81,7 @@ public class GoldCave extends FieldObject implements Immovable {
                     }
                 }
                 case "A" -> {
-                    player.moveInCave(-1, 0, caveField);
+                    player.moveInCave(-1, 0, dungeonField);
                     if (areAllZombiesDead()) {
                         System.out.println("Вы победили всех зомби и получаете артефакт!");
                         player.receiveArtifact();
@@ -89,7 +91,7 @@ public class GoldCave extends FieldObject implements Immovable {
                     }
                 }
                 case "D" -> {
-                    player.moveInCave(1, 0, caveField);
+                    player.moveInCave(1, 0, dungeonField);
                     if (areAllZombiesDead()) {
                         System.out.println("Вы победили всех зомби и получаете артефакт!");
                         player.receiveArtifact();
@@ -107,8 +109,9 @@ public class GoldCave extends FieldObject implements Immovable {
             }
 
             if (areAllZombiesDead()) {
-                System.out.println("Вы победили всех зомби и получаете артефакт!");
+                System.out.println("Вы победили всех зомби и получаете "+ goldAmount +" золота с артефактом!");
                 player.receiveArtifact();
+                player.addGold(goldAmount);
                 completed = true;
                 removePlayerFromCave(player);
                 return;
@@ -117,45 +120,10 @@ public class GoldCave extends FieldObject implements Immovable {
 
     }
 
-    private void attackNearestZombie(Hero player) {
-        Zombie target = findNearestZombie(player.getPosition());
-        if (target != null) {
-            System.out.println("Вы атакуете ближайшего зомби!");
-            target.takeDamage(50); // Условный урон
-            if (target.isDead()) {
-                System.out.println("Зомби уничтожен!");
-                caveField.getCell(target.getPosition().x(), target.getPosition().y()).removeObject(target);
-            } else {
-                System.out.println("Зомби ранен, но ещё жив.");
-            }
-        } else {
-            System.out.println("Врагов рядом нет.");
-        }
-    }
-
-    private Zombie findNearestZombie(Position from) {
-        int radius = 2; // Радиус поиска
-        for (int dx = -radius; dx <= radius; dx++) {
-            for (int dy = -radius; dy <= radius; dy++) {
-                int nx = from.x() + dx;
-                int ny = from.y() + dy;
-                if (nx >= 0 && ny >= 0 && nx < 5 && ny < 5) {
-                    List<FieldObject> objects = caveField.getCell(nx, ny).getObjects();
-                    for (FieldObject obj : objects) {
-                        if (obj instanceof Zombie zombie && !zombie.isDead()) {
-                            return zombie;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     private boolean areAllZombiesDead() {
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
-                for (FieldObject obj : caveField.getCell(x, y).getObjects()) {
+                for (FieldObject obj : dungeonField.getCell(x, y).getObjects()) {
                     if (obj instanceof Zombie zombie && !zombie.isDead()) {
                         return false;
                     }
@@ -166,7 +134,7 @@ public class GoldCave extends FieldObject implements Immovable {
     }
 
     private void removePlayerFromCave(Hero player) {
-        caveField.getCell(player.getPosition().x(), player.getPosition().y()).removeObject(player);
+        dungeonField.getCell(player.getPosition().x(), player.getPosition().y()).removeObject(player);
         inCave = false;
         // Можно вернуть игрока в исходную точку карты
         player.setPosition(this.getPosition());
@@ -175,6 +143,11 @@ public class GoldCave extends FieldObject implements Immovable {
     public boolean isInCave() {
         return inCave;
     }
+
+    public int getGoldAmount() {
+        return goldAmount;
+    }
+
     private void clearConsole() {
         for (int i = 0; i < 50; i++) System.out.println();
     }

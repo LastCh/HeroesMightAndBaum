@@ -100,16 +100,8 @@ public class MenuManager {
         cplayer = player;
     }
 
-    public ComputerHero getComputerPlayer() {
-        return cplayer;
-    }
-
     public void setHumanPlayer(HumanHero player) {
         hplayer = player;
-    }
-
-    public HumanHero getHumanPlayer() {
-        return hplayer;
     }
 
     public GameMenu getGameMenu() {
