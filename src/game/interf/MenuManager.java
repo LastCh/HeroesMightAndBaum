@@ -1,8 +1,8 @@
 package game.interf;
 
 import game.core.engine.GameManager;
-import game.model.player.ComputerPlayer;
-import game.model.player.HumanPlayer;
+import game.model.hero.ComputerHero;
+import game.model.hero.HumanHero;
 
 
 public class MenuManager {
@@ -10,8 +10,8 @@ public class MenuManager {
     private final CastleMenu castleMenu = new CastleMenu();
     private final GameMenu gameMenu = new GameMenu();
     private final GameManager gmanager = new GameManager();
-    private HumanPlayer hplayer;
-    private ComputerPlayer cplayer;
+    private HumanHero hplayer;
+    private ComputerHero cplayer;
 
     public void run() {
         boolean inMainMenu = true;
@@ -82,12 +82,12 @@ public class MenuManager {
         gameMenu.display();
     }
 
-    private void handleCastleMenu(HumanPlayer player) {
+    private void handleCastleMenu(HumanHero player) {
         int result;
         do {
             castleMenu.display();
             result = castleMenu.handleInput(player);
-        } while (result != 3);
+        } while (result != 4);
     }
 
     private void startNewGame() {
@@ -96,19 +96,19 @@ public class MenuManager {
         gmanager.startGame();
     }
 
-    public void setComputerPlayer(ComputerPlayer player) {
+    public void setComputerPlayer(ComputerHero player) {
         cplayer = player;
     }
 
-    public ComputerPlayer getComputerPlayer() {
+    public ComputerHero getComputerPlayer() {
         return cplayer;
     }
 
-    public void setHumanPlayer(HumanPlayer player) {
+    public void setHumanPlayer(HumanHero player) {
         hplayer = player;
     }
 
-    public HumanPlayer getHumanPlayer() {
+    public HumanHero getHumanPlayer() {
         return hplayer;
     }
 

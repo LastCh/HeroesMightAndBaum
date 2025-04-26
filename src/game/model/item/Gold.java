@@ -1,9 +1,9 @@
 package game.model.item;
 
-import game.model.player.Player;
+import game.model.hero.Hero;
 
 public class Gold extends Item {
-    public Gold(int count, Player player) {
+    public Gold(int count, Hero player) {
         super(count, player);
     }
 }

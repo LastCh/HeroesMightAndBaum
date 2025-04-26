@@ -1,7 +1,7 @@
 package game.interf;
 
 import game.model.building.incastle.*;
-import game.model.player.HumanPlayer;
+import game.model.hero.HumanHero;
 
 public class BuyBuildingMenu extends Inter {
     @Override
@@ -27,7 +27,7 @@ public class BuyBuildingMenu extends Inter {
                 "  ╚════════════════════════════════════════════╝\n");
     }
 
-    public int handleInput(HumanPlayer player) {
+    public int handleInput(HumanHero player) {
         int choice = super.handleInput();
         clearConsole();
 
@@ -35,7 +35,7 @@ public class BuyBuildingMenu extends Inter {
 
         switch (choice) {
             case 1: // Таверна
-                if (!player.haveMoney(GameBuildings.TAVERN.getCost())) {
+                if (player.noHaveMoney(GameBuildings.TAVERN.getCost())) {
                     showGold.run();
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
@@ -52,7 +52,7 @@ public class BuyBuildingMenu extends Inter {
                 break;
 
             case 2: // Конюшня
-                if (!player.haveMoney(GameBuildings.STABLE.getCost())) {
+                if (player.noHaveMoney(GameBuildings.STABLE.getCost())) {
                     showGold.run();
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
@@ -65,11 +65,11 @@ public class BuyBuildingMenu extends Inter {
                 player.spendMoney(GameBuildings.STABLE.getCost());
                 player.getMyCastle().addBuilding(GameBuildings.STABLE);
                 showGold.run();
-                System.out.println(GREEN + "🐴 Конюшня куплена! Герои будут передвигаться быстрее!" + RESET);
+                System.out.println(GREEN + "🐴 Конюшня куплена! После посещения замка герои будут передвигаться быстрее!" + RESET);
                 break;
 
             case 3: // Сторожевой пост
-                if (!player.haveMoney(GameBuildings.GUARD_POST.getCost())) {
+                if (player.noHaveMoney(GameBuildings.GUARD_POST.getCost())) {
                     showGold.run();
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
@@ -86,7 +86,7 @@ public class BuyBuildingMenu extends Inter {
                 break;
 
             case 4: // Башня арбалетчиков
-                if (!player.haveMoney(GameBuildings.CROSSBOWMENS_TOWER.getCost())) {
+                if (player.noHaveMoney(GameBuildings.CROSSBOWMENS_TOWER.getCost())) {
                     showGold.run();
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
@@ -103,7 +103,7 @@ public class BuyBuildingMenu extends Inter {
                 break;
 
             case 5: // Оружейная
-                if (!player.haveMoney(GameBuildings.ARMORY.getCost())) {
+                if (player.noHaveMoney(GameBuildings.ARMORY.getCost())) {
                     showGold.run();
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
@@ -120,7 +120,7 @@ public class BuyBuildingMenu extends Inter {
                 break;
 
             case 6: // Арена
-                if (!player.haveMoney(GameBuildings.ARENA.getCost())) {
+                if (player.noHaveMoney(GameBuildings.ARENA.getCost())) {
                     showGold.run();
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
@@ -137,7 +137,7 @@ public class BuyBuildingMenu extends Inter {
                 break;
 
             case 7: // Собор
-                if (!player.haveMoney(GameBuildings.CATHEDRAL.getCost())) {
+                if (player.noHaveMoney(GameBuildings.CATHEDRAL.getCost())) {
                     showGold.run();
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;

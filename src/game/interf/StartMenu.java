@@ -18,7 +18,7 @@ public class StartMenu extends Inter {
             System.out.println(PURPLE + line + RESET);
             try {
                 Thread.sleep(100); // Анимация появления
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException _) {}
         }
         System.out.println("\n" +
                 GRADIENT_1 + "  ╔════════════════════════════════════════════╗\n" +

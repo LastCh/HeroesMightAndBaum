@@ -1,6 +1,6 @@
 package game.api;
 
-import game.model.player.Player;
+import game.model.hero.Hero;
 
 public abstract class FieldObject implements GameObject {
     protected Position position;
@@ -29,5 +29,5 @@ public abstract class FieldObject implements GameObject {
         return priority;
     }
 
-    public abstract void interact(Player player);
+    public abstract void interact(Hero player);
 }

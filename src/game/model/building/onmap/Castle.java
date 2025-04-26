@@ -4,8 +4,8 @@ import game.api.Immovable;
 import game.api.Position;
 import game.api.FieldObject;
 import game.model.building.incastle.BuildingCastle;
-import game.model.player.Player;
-import game.model.player.HumanPlayer;
+import game.model.hero.Hero;
+import game.model.hero.HumanHero;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,12 +55,12 @@ public class Castle extends FieldObject implements Immovable {
         return health <= 0;
     }
 
-    private void buyBuilding(HumanPlayer player) {
+    private void buyBuilding(HumanHero player) {
         System.out.println("Вы купили здание в замке! (Функционал можно расширить)");
     }
 
     @Override
-    public void interact(Player player) {
+    public void interact(Hero player) {
 
     }
 }

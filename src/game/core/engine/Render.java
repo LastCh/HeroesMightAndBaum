@@ -3,22 +3,22 @@ package game.core.engine;
 import game.interf.MenuManager;
 import game.map.Field;
 import game.model.building.onmap.Castle;
-import game.model.player.ComputerPlayer;
-import game.model.player.HumanPlayer;
+import game.model.hero.ComputerHero;
+import game.model.hero.HumanHero;
 
 import java.util.Scanner;
 
 public class Render {
     private final Field field;
-    private final HumanPlayer player;
-    private final ComputerPlayer computerPlayer;
+    private final HumanHero player;
+    private final ComputerHero computerPlayer;
     private final Scanner scanner; // Теперь передаётся извне
     private final MenuManager menu = new MenuManager();
     private final Castle castlePlayer;
     private final Castle castleBot;
 
-    public Render(Field field, HumanPlayer player, Scanner sharedScanner,
-                  ComputerPlayer computer, Castle cb, Castle cp) {
+    public Render(Field field, HumanHero player, Scanner sharedScanner,
+                  ComputerHero computer, Castle cb, Castle cp) {
         this.field = field;
         this.player = player;
         this.scanner = sharedScanner;
@@ -31,10 +31,9 @@ public class Render {
     }
 
     public void startGameLoop() {
-        boolean running = true;
         System.out.println("Для начала игры купите первое здание в свой замок и наймите юнитов," +
                 " чтобы ваш герой смог передвигаться!");
-        while (running) {
+        while (true) {
             renderField();
             menu.callGame();
             String input = scanner.nextLine().trim().toUpperCase();
@@ -111,7 +110,7 @@ public class Render {
     public void renderField() {
         field.render();
         menu.getGameMenu().display(player.getMovementPoints(), castlePlayer.getHealth(),
-                castleBot.getHealth(), player.getGold(), player.getHealth());
+                castleBot.getHealth(), player.getGold(), player.getHealth(), player.getPower());
     }
 
     private boolean checkCastleCaptured() {

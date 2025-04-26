@@ -1,6 +1,6 @@
 package game.interf;
 
-import game.model.player.HumanPlayer;
+import game.model.hero.HumanHero;
 
 public class CastleMenu extends Inter {
     private final BuyBuildingMenu buyBuildingMenu = new BuyBuildingMenu();
@@ -15,11 +15,12 @@ public class CastleMenu extends Inter {
                 "  ╠══════════════════════════════════╣\n" +
                 "  ║ " + YELLOW + "1. " + CYAN + "Улучшить замок               " + RESET + " ║\n" +
                 "  ║ " + YELLOW + "2. " + CYAN + "Нанять юнитов                " + RESET + " ║\n" +
-                "  ║ " + YELLOW + "3. " + CYAN + "Вернуться в игровое меню     " + RESET + " ║\n" +
+                "  ║ " + YELLOW + "3. " + CYAN + "Купить героев                " + RESET + " ║\n" +
+                "  ║ " + YELLOW + "4. " + CYAN + "Вернуться в игровое меню     " + RESET + " ║\n" +
                 "  ╚══════════════════════════════════╝\n");
     }
 
-    public int handleInput(HumanPlayer player) {
+    public int handleInput(HumanHero player) {
         int choice = super.handleInput();
         clearConsole();
         switch (choice) {
@@ -34,6 +35,11 @@ public class CastleMenu extends Inter {
                 handleUnitMenu(player);
                 break;
             case 3:
+                clearConsole();
+                System.out.println(BOLD + GOLD_COLOR + "💰 Ваше золото: " + player.getGold() + RESET + "\n");
+                handleUnitMenu(player);
+                break;
+            case 4:
                 System.out.println(CYAN + "↩️ Возвращение в игровое меню..." + RESET);
                 break;
             default:
@@ -42,7 +48,7 @@ public class CastleMenu extends Inter {
         return choice;
     }
 
-    private void handleUnitMenu(HumanPlayer player) {
+    private void handleUnitMenu(HumanHero player) {
         int result;
         do {
             buyUnitMenu.display();
@@ -50,7 +56,15 @@ public class CastleMenu extends Inter {
         } while (result != 6);
     }
 
-    private void handleBuildingMenu(HumanPlayer player) {
+    private void handleHeroesMenu(HumanHero player) {
+        int result;
+        do {
+            buyUnitMenu.display();
+            result = buyUnitMenu.handleInput(player);
+        } while (result != 6);
+    }
+
+    private void handleBuildingMenu(HumanHero player) {
         int result;
         do {
             buyBuildingMenu.display();

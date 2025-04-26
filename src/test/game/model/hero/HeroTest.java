@@ -1,4 +1,4 @@
-package game.model.player;
+package game.model.hero;
 
 import game.api.Direction;
 import game.api.Position;
@@ -11,19 +11,19 @@ import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlayerTest {
-    private TestPlayer player;
+public class HeroTest {
+    private TestHero player;
     private Field field;
     private Castle castle;
 
     // Вспомогательный класс для тестирования
-    private static class TestPlayer extends Player {
-        public TestPlayer(Position startPosition, Direction startDirection, String colorCode, Castle castle) {
+    private static class TestHero extends Hero {
+        public TestHero(Position startPosition, Direction startDirection, String colorCode, Castle castle) {
             super(startPosition, startDirection, colorCode, castle, 1, 5, 100);
         }
 
         @Override
-        public void interact(Player player) {
+        public void interact(Hero player) {
             // Пустая реализация для тестов
         }
     }
@@ -33,7 +33,7 @@ public class PlayerTest {
         // Создаем сканер для конструктора Castle
         Scanner scanner = new Scanner(System.in);
         castle = new Castle(new Position(0, 0), scanner, 0); // Используем правильный конструктор
-        player = new TestPlayer(new Position(2, 2), Direction.UP, "RED", castle);
+        player = new TestHero(new Position(2, 2), Direction.UP, "RED", castle);
         field = new Field(10, 10);
     }
 
@@ -73,7 +73,7 @@ public class PlayerTest {
 
     @Test
     void testAttack() {
-        TestPlayer enemy = new TestPlayer(new Position(2, 3), Direction.DOWN, "BLUE", castle);
+        TestHero enemy = new TestHero(new Position(2, 3), Direction.DOWN, "BLUE", castle);
         int initialHealth = enemy.getHealth();
 
         player.attack(enemy);
@@ -96,8 +96,8 @@ public class PlayerTest {
 
     @Test
     void testIsInRange() {
-        TestPlayer nearbyPlayer = new TestPlayer(new Position(3, 3), Direction.LEFT, "BLUE", castle);
-        TestPlayer farPlayer = new TestPlayer(new Position(10, 10), Direction.LEFT, "BLUE", castle);
+        TestHero nearbyPlayer = new TestHero(new Position(3, 3), Direction.LEFT, "BLUE", castle);
+        TestHero farPlayer = new TestHero(new Position(10, 10), Direction.LEFT, "BLUE", castle);
 
         assertTrue(player.isInRange(nearbyPlayer, 2));
         assertFalse(player.isInRange(farPlayer, 2));

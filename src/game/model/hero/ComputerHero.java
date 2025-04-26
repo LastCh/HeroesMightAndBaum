@@ -1,24 +1,22 @@
-package game.model.player;
+package game.model.hero;
 
 import game.api.Direction;
 import game.api.Position;
 import game.map.Field;
 import game.model.building.onmap.Castle;
 
-import java.util.Random;
-
-public class ComputerPlayer extends Player {
+public class ComputerHero extends Hero {
     private static final String COLOR = "\u001B[31m";
     private final Position targetCastle;
     private boolean preferX = true; // Флаг для чередования осей
 
-    public ComputerPlayer(Position startPosition, Position targetCastle, int points, Castle castle, int gold) {
+    public ComputerHero(Position startPosition, Position targetCastle, int points, Castle castle, int gold) {
         super(startPosition, Direction.UP, COLOR, castle, 10, points, gold);
         this.targetCastle = targetCastle;
         this.power = 5;
     }
 
-    public void performAITurn(Field field, HumanPlayer humanPlayer) {
+    public void performAITurn(Field field, HumanHero humanPlayer) {
         moveTowardsCastle(field);
 
         // Проверка расстояния для атаки
@@ -84,7 +82,7 @@ public class ComputerPlayer extends Player {
                 && pos.y() >= 0 && pos.y() < field.getHeight();
     }
 
-    private void startBattle(HumanPlayer player) {
+    private void startBattle(HumanHero player) {
         System.out.println("Компьютер атакует игрока!");
         player.setHealth(player.getHealth() - this.power);
 
@@ -96,13 +94,18 @@ public class ComputerPlayer extends Player {
     }
 
     @Override
+    public void makeMove(Field field) {
+
+    }
+
+    @Override
     public void move(int dx, int dy, Field field) {
         // Реализация для интерфейса
         tryMove(dx, dy, field);
     }
 
     @Override
-    public void interact(Player player) {
+    public void interact(Hero player) {
 
     }
 }

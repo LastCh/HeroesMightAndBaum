@@ -1,12 +1,12 @@
 package game.model.item;
 
-import game.model.player.Player;
+import game.model.hero.Hero;
 
 public abstract class Item {
     protected final int amount;
-    protected Player affiliation;
+    protected Hero affiliation;
 
-    public Item(int count, Player player) {
+    public Item(int count, Hero player) {
         this.amount = count;
         this.affiliation = player;
     }

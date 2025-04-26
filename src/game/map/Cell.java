@@ -37,7 +37,7 @@ public class Cell {
     public String getDisplaySymbol() {
         String symbol;
         if (!objects.isEmpty()) {
-            symbol = objects.get(0).getColoredSymbol();
+            symbol = objects.getFirst().getColoredSymbol();
         } else {
             symbol = terrainType != null
                     ? terrainType.getColoredBlock()

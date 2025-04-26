@@ -8,10 +8,11 @@ public class GameMenu extends Inter {
                 "  |  ➡️ [D] - Вправо  |  📜 [M] - Меню  |  ⏭️ [Q] - Пропуск хода");
     }
 
-    public void display(int points, int castleHealth, int enemyCastleHealth, int money, int hp) {
+    public void display(int points, int castleHealth, int enemyCastleHealth, int money, int hp, int power) {
         System.out.println("📊 Статистика:");
         System.out.println("🏃 Очки передвижения: " + points + "  |  💰 Золото: " + money +
-                "  |  ❤️ Здоровье: " + hp + " HP" + "  |  🏰 Замок: " + castleHealth + " HP" +
+                "  |  ❤️ Здоровье: " + hp + " HP" + "  |  \uD83D\uDCAA Сила: " + power +
+                "  |  🏰 Замок: " + castleHealth + " HP" +
                 "  |  ☠️ Вражеский замок: " + enemyCastleHealth + " HP");
     }
 

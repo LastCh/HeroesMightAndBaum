@@ -1,20 +1,21 @@
-package game.model.player;
+package game.model.hero;
 
 import game.api.Direction;
 import game.api.Position;
 import game.map.Field;
+import game.model.building.incastle.GameBuildings;
 import game.model.building.onmap.Castle;
 
-
-public class HumanPlayer extends Player {
+public class HumanHero extends Hero {
     private static final String COLOR = "\u001B[34m";
+    boolean speedStableBonus = false;
 
-    public HumanPlayer(Position startPosition, int points, Castle castle, int gold) {
+    public HumanHero(Position startPosition, int points, Castle castle, int gold) {
         super(startPosition, Direction.UP, COLOR, castle, 10, points, gold);
     }
 
     @Override
-    public void interact(Player player) {
+    public void interact(Hero player) {
         System.out.println("Игрок взаимодействует с другим игроком.");
     }
 
@@ -74,14 +75,14 @@ public class HumanPlayer extends Player {
         accumulatedMovementCoef =newAccumulatedMovementCoef - (int)newAccumulatedMovementCoef;
         int finalCost = movementPoints - cost;
         spendMovementPoints(finalCost);
-        if(!(dx == 0 || dy == 0)){System.out.println("Вы переместились на: " + newPos);}
+        if(dx != 0 || dy != 0){System.out.println("Вы переместились на: " + newPos);}
         diag = newDiag;
         field.moveObject(this, this.position.x(), this.position.y(), newPos.x(), newPos.y());
         this.position = newPos;
     }
 
     public boolean targetCheck(Field field, Position newPos) {
-        ComputerPlayer target = field.getComputerPlayerAt(newPos);
+        ComputerHero target = field.getComputerHeroAt(newPos);
         if (target != null) {
             this.attack(target);
             spendMovementPoints(1);
@@ -96,13 +97,23 @@ public class HumanPlayer extends Player {
         if (castle != null) {
             if (castle != myCastle) { // Атакуем только ЧУЖИЕ замки
                 castle.takeDamage(power);
-                System.out.println("Вы атакуете вражеский замок! Здоровье: " + castle.getHealth());
+                System.out.println("Вы атакуете вражеский замок!");
             } else {
-                System.out.println("Это ваш замок, атака невозможна!");
+                System.out.println("Вы находитесь в своём замке!");
+                if(castle.contains(GameBuildings.STABLE) && (speedStableBonus == false)){
+                    System.out.println("В вашем замке есть конюшня, ваши характеристики передвижения улучшены!");
+                    speedStableBonus = true;
+                }
+                return false;
             }
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void makeMove(Field field) {
+        // Люди сами управляют своим героем, ничего делать не нужно
     }
 
     public boolean isValidPosition(Position newPos) {

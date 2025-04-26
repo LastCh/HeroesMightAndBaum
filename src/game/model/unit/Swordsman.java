@@ -1,7 +1,5 @@
 package game.model.unit;
 
-import game.model.player.Player;
-
 public class Swordsman extends Unit {
     private final double distanceModify = 1;
     private final double powerModify = 1.1;
@@ -12,4 +10,9 @@ public class Swordsman extends Unit {
     public int getCost() {
         return cost;
     }
+
+    public int getPower() {
+        return (int)(10*powerModify);
+    }
+
 }

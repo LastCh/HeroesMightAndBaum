@@ -2,16 +2,16 @@ package game.core.engine;
 
 import game.api.Position;
 import game.map.Field;
-import game.model.player.HumanPlayer;
-import game.model.player.ComputerPlayer;
+import game.model.hero.HumanHero;
+import game.model.hero.ComputerHero;
 import game.model.building.onmap.Castle;
 
 import java.util.Scanner;
 
 public class GameManager {
     private final Field field;
-    private final HumanPlayer human;
-    private final ComputerPlayer computer;
+    private final HumanHero human;
+    private final ComputerHero computer;
     private final Scanner scanner = new Scanner(System.in);
     private final Castle botCastle;
     private final Castle playerCastle;
@@ -26,8 +26,8 @@ public class GameManager {
         field.getCell(8, 8).addObject(botCastle);
         field.getCell(1, 1).addObject(playerCastle);
 
-        this.human = new HumanPlayer(new Position(0, 0), 10, playerCastle, 1000);
-        this.computer = new ComputerPlayer(new Position(9, 9), playerCastle.getPosition(), 10, botCastle, 500);
+        this.human = new HumanHero(new Position(0, 0), 10, playerCastle, 1000);
+        this.computer = new ComputerHero(new Position(9, 9), playerCastle.getPosition(), 10, botCastle, 500);
 
         field.getCell(0, 0).addObject(human);
         field.getCell(9, 9).addObject(computer);

@@ -1,7 +1,5 @@
 package game.model.unit;
 
-import game.model.player.Player;
-
 public class Paladin extends Unit {
     private final double distanceModify = 1;
     private final double powerModify = 1.3;
@@ -11,5 +9,9 @@ public class Paladin extends Unit {
 
     public int getCost() {
         return cost;
+    }
+
+    public int getPower() {
+        return (int)(10*powerModify);
     }
 }

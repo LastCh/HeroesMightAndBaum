@@ -3,9 +3,9 @@ package game.map;
 import game.api.FieldObject;
 import game.api.Position;
 import game.model.building.onmap.Castle;
-import game.model.player.ComputerPlayer;
-import game.model.player.HumanPlayer;
-import game.model.player.Player;
+import game.model.hero.ComputerHero;
+import game.model.hero.HumanHero;
+import game.model.hero.Hero;
 
 public class Field {
     private final int width;
@@ -71,24 +71,36 @@ public class Field {
         System.out.println("+");
     }
 
-    public ComputerPlayer getComputerPlayerAt(Position pos) {
+    public ComputerHero getComputerHeroAt(Position pos) {
         Cell cell = getCell(pos.x(), pos.y());
         if (cell != null) {
             for (FieldObject obj : cell.getObjects()) {
-                if (obj instanceof ComputerPlayer) {
-                    return (ComputerPlayer) obj;
+                if (obj instanceof ComputerHero) {
+                    return (ComputerHero) obj;
                 }
             }
         }
         return null;
     }
 
-    public HumanPlayer getHumanPlayerAt(Position pos) {
+    public Hero getHeroAt(Position pos) {
         Cell cell = getCell(pos.x(), pos.y());
         if (cell != null) {
             for (FieldObject obj : cell.getObjects()) {
-                if (obj instanceof HumanPlayer) {
-                    return (HumanPlayer) obj;
+                if (obj instanceof Hero) {
+                    return (Hero) obj;
+                }
+            }
+        }
+        return null;
+    }
+
+    public HumanHero getHumanHeroAt(Position pos) {
+        Cell cell = getCell(pos.x(), pos.y());
+        if (cell != null) {
+            for (FieldObject obj : cell.getObjects()) {
+                if (obj instanceof HumanHero) {
+                    return (HumanHero) obj;
                 }
             }
         }
@@ -107,7 +119,7 @@ public class Field {
         return null;
     }
 
-    public void removePlayer(Player player) {
+    public void removePlayer(Hero player) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Cell cell = grid[x][y];
