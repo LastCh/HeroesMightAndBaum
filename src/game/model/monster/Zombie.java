@@ -14,7 +14,6 @@ public class Zombie extends Hero {
     }
 
     public void makeMove() {
-        // Зомби не передвигается самостоятельно
     }
 
     @Override
