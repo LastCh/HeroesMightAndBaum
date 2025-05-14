@@ -9,13 +9,16 @@ import game.model.building.onmap.Castle;
 import game.model.building.onmap.GoldCave;
 import game.model.item.MagicalArtifact;
 import game.model.monster.Zombie;
+import game.model.unit.Unit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HumanHero extends Hero {
     private static final String COLOR = "\u001B[34m";
     boolean speedStableBonus = false;
     private MagicalArtifact magicalArtifact;
+    private String name;
 
     public HumanHero(Position startPosition, int points, Castle castle, int gold) {
         super(startPosition, Direction.UP, COLOR, castle, 10, points, gold);
@@ -27,11 +30,19 @@ public class HumanHero extends Hero {
     }
 
     public void move(int dx, int dy, Field field, int d) {
-
         Position newPos = new Position(position.x() + dx, position.y() + dy);
         int newDiag = diag + d;
         int cost = movementPoints;
         double newAccumulatedMovementCoef = accumulatedMovementCoef;
+
+        if(!this.isAlive()){
+            field.moveObject(this, this.position.x(), this.position.y(), 0, 0);
+            Position defPos = new Position(0, 0);
+            this.position = defPos;
+            ArrayList<Unit> newUni = new ArrayList<>();
+            this.setUnits(newUni);
+            return;
+        }
 
         // Проверка на наличие отряда
         if (units.isEmpty()) {
@@ -217,6 +228,23 @@ public class HumanHero extends Hero {
         }else {
             return true;
         }
+    }
+
+    public String serialize() {
+        return name + "," + health + "," + gold;
+    }
+
+    public static HumanHero deserialize(String data) {
+        String[] parts = data.split(",");
+        String heroName = parts[0];
+        int heroHealth = Integer.parseInt(parts[1]);
+        int heroGold = Integer.parseInt(parts[2]);
+
+        // Создаем героя с начальными данными
+        HumanHero hero = new HumanHero(new Position(0, 0), 10, null, heroGold); // Нужны стартовые параметры
+        hero.name = heroName;
+        hero.setHealth(heroHealth);
+        return hero;
     }
 
 }

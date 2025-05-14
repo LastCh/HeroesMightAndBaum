@@ -3,7 +3,7 @@ package game.interf;
 import game.core.engine.GameManager;
 import game.model.hero.ComputerHero;
 import game.model.hero.HumanHero;
-
+import java.io.*;
 
 public class MenuManager {
     private final StartMenu startMenu = new StartMenu();
@@ -35,12 +35,10 @@ public class MenuManager {
                     startMenu.clearConsole();
                     System.out.println("Неверный выбор. Попробуйте снова.");
             }
-
         }
     }
 
     public boolean showGameMenu() {
-        // ANSI коды цветов
         final String RESET = "\u001B[0m";
         final String CYAN = "\u001B[36m";
         final String YELLOW = "\u001B[33m";
@@ -82,6 +80,33 @@ public class MenuManager {
         gameMenu.display();
     }
 
+    private void saveGame(String playerName) {
+        try (FileWriter writer = new FileWriter(playerName + "_save.txt")) {
+            writer.write(hplayer.serialize() + "\n");
+            writer.write(cplayer.serialize() + "\n");
+            System.out.println("Игра успешно сохранена!");
+        } catch (IOException e) {
+            System.out.println("Ошибка при сохранении игры: " + e.getMessage());
+        }
+    }
+
+    private void loadGame() {
+        System.out.print("Введите имя для загрузки игры: ");
+        String playerName = startMenu.readStringInput();
+        try (BufferedReader reader = new BufferedReader(new FileReader(playerName + "_save.txt"))) {
+            String humanData = reader.readLine();
+            String computerData = reader.readLine();
+            hplayer = HumanHero.deserialize(humanData);
+            cplayer = ComputerHero.deserialize(computerData);
+            gmanager.loadGame(hplayer, cplayer);
+            System.out.println("Игра успешно загружена!");
+        } catch (IOException e) {
+            System.out.println("Ошибка при загрузке игры: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Файл поврежден или несовместим.");
+        }
+    }
+
     private void handleCastleMenu(HumanHero player) {
         int result;
         do {
@@ -106,9 +131,5 @@ public class MenuManager {
 
     public GameMenu getGameMenu() {
         return gameMenu;
-    }
-
-    private void loadGame() {
-        System.out.println("Загрузка игры...");
     }
 }

@@ -45,6 +45,9 @@ public abstract class Hero extends FieldObject implements Movable {
 
     public void attack(Hero target) {
         target.takeDamage(this.power);
+        if(target.getHealth() < 0) {
+            target.setHealth(0);
+        }
         System.out.printf("%s атаковал %s! Осталось здоровья: %d\n",
                 this.getClass().getSimpleName(),
                 target.getClass().getSimpleName(),

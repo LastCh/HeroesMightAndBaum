@@ -17,6 +17,12 @@ public class ComputerHero extends Hero {
     private boolean preferX = true;
     private boolean stableBought = false;
     private boolean firstUnitBought = false;
+    private String name;
+
+    public ComputerHero() {
+        super(new Position(0, 0), Direction.UP, COLOR, null, 10, 0, 0); // Можно использовать дефолтные значения или передать их позже
+        this.targetCastle = new Position(0, 0); // или передать позже
+    }
 
     public ComputerHero(Position startPosition, Position targetCastle, int points, Castle castle, int gold) {
         super(startPosition, Direction.UP, COLOR, castle, 10, points, gold);
@@ -26,6 +32,15 @@ public class ComputerHero extends Hero {
 
 
     public void makeMove(Field field) {
+        if(!this.isAlive()){
+            field.moveObject(this, this.position.x(), this.position.y(), 9, 9);
+            Position defPos = new Position(9, 9);
+            this.position = defPos;
+            ArrayList<Unit> newUni = new ArrayList<>();
+            this.setUnits(newUni);
+            return;
+        }
+
         if (units.isEmpty() && noHaveMoney(GameBuildings.STABLE.getCost() + GameUnits.SPEARMAN.getCost())) {
             return;
         } else if(!noHaveMoney(GameBuildings.STABLE.getCost() + GameUnits.SPEARMAN.getCost())){
@@ -151,5 +166,20 @@ public class ComputerHero extends Hero {
 
     @Override
     public void interact(Hero player) {
+    }
+    public String serialize() {
+        // Пример: просто сохраняем имя героя (или другое состояние)
+        return this.name; // или другое нужное тебе поле
+    }
+
+    public static ComputerHero deserialize(String data) {
+        ComputerHero hero = new ComputerHero();
+        // Предположим, что в data у нас просто имя героя (можно добавить другие данные)
+        hero.name = data;
+
+        // Здесь можно добавить больше логики для восстановления всех остальных данных объекта,
+        // например, позицию, здоровье, золотые монеты и т.д.
+
+        return hero;
     }
 }

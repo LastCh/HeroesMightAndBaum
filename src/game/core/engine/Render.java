@@ -134,11 +134,16 @@ public class Render {
 
             if (!player.isAlive()) {
                 System.out.println("Ваш герой погиб!");
-                break;
+                player.resetMovementPoints();
+                player.setGold(200);
+                player.move(0,0,field, 0);
+                player.setHealth(100);
             }
-
             if (!computerPlayer.isAlive()) {
-                field.removePlayer(computerPlayer);
+                computerPlayer.resetMovementPoints();
+                computerPlayer.setGold(200);
+                computerPlayer.makeMove(field);
+                computerPlayer.setHealth(100);
             }
         }
     }

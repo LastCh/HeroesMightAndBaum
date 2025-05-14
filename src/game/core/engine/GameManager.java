@@ -11,8 +11,8 @@ import java.util.Scanner;
 
 public class GameManager {
     private final Field field;
-    private final HumanHero human;
-    private final ComputerHero computer;
+    private HumanHero human;         // убрал final
+    private ComputerHero computer;   // убрал final
     private final Scanner scanner = new Scanner(System.in);
     private final Castle botCastle;
     private final Castle playerCastle;
@@ -34,12 +34,13 @@ public class GameManager {
 
         field.getCell(0, 0).addObject(human);
         field.getCell(9, 9).addObject(computer);
-        for (int i = 0; i < 3; i++) { // 3 пещеры
+
+        for (int i = 0; i < 3; i++) {
             int x, y;
             do {
                 x = (int) (Math.random() * field.getWidth());
                 y = (int) (Math.random() * field.getHeight());
-            } while (!field.getCell(x, y).isEmpty()); // ищем свободное место
+            } while (!field.getCell(x, y).isEmpty());
 
             GoldCave cave = new GoldCave(new Position(x, y), 500 + i * 100);
             field.getCell(x, y).addObject(cave);
@@ -69,5 +70,11 @@ public class GameManager {
 
     public ComputerHero getComputerHero() {
         return computer;
+    }
+
+    public void loadGame(HumanHero hplayer, ComputerHero cplayer) {
+        this.human = hplayer;
+        this.computer = cplayer;
+        // Можно дополнительно обновить объекты на поле field, если нужно
     }
 }

@@ -18,4 +18,5 @@ public class MagicalArtifact extends Item{
     public void spendArtifact(){
         amount--;
     }
+
 }
