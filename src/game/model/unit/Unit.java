@@ -1,6 +1,6 @@
 package game.model.unit;
 
-public abstract class Unit implements CloneableUnit {
+public abstract class Unit {
     protected int power;
     protected int cost;
 
@@ -12,7 +12,6 @@ public abstract class Unit implements CloneableUnit {
         return cost;
     }
 
-    @Override
     public Unit clone() {
         try {
             return (Unit) super.clone();

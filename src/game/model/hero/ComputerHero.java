@@ -1,8 +1,8 @@
 package game.model.hero;
 
-import game.api.Direction;
 import game.api.Position;
 import game.map.Field;
+import game.model.building.incastle.BuildingCastle;
 import game.model.building.incastle.GameBuildings;
 import game.model.building.onmap.Castle;
 import game.model.unit.GameUnits;
@@ -18,50 +18,51 @@ public class ComputerHero extends Hero {
     private boolean stableBought = false;
     private boolean firstUnitBought = false;
     private String name;
+    private static final double HERO_PURCHASE_CHANCE = 1.0 / 6;
+    private static final int MIN_GOLD_FOR_HERO = 200;
+    private int turnCounter = 0;
+
 
     public ComputerHero() {
-        super(new Position(0, 0), Direction.UP, COLOR, null, 10, 0, 0); // Можно использовать дефолтные значения или передать их позже
-        this.targetCastle = new Position(0, 0); // или передать позже
+        super(new Position(0, 0), COLOR, null, 10, 0, 0); // Можно использовать дефолтные значения или передать их позже
+        this.targetCastle = new Position(0, 0);
     }
 
     public ComputerHero(Position startPosition, Position targetCastle, int points, Castle castle, int gold) {
-        super(startPosition, Direction.UP, COLOR, castle, 10, points, gold);
+        super(startPosition, COLOR, castle, 10, points, gold);
         this.targetCastle = targetCastle;
-        this.power = 0; // Начальная сила
+        this.power = 0;
+        this.movementPoints = points;
     }
 
 
     public void makeMove(Field field) {
-        if(!this.isAlive()){
-            field.moveObject(this, this.position.x(), this.position.y(), 9, 9);
-            Position defPos = new Position(9, 9);
-            this.position = defPos;
-            ArrayList<Unit> newUni = new ArrayList<>();
-            this.setUnits(newUni);
+        if (!this.isAlive()) {
+            handleRevive(field);
             return;
         }
 
+        turnCounter++;
+
+        // Проверяем возможность покупки героя
+        if (shouldBuyHero()) {
+            buyRandomHero(field);
+        }
+
+        // Если нет ни одного юнита и нет золота — ничего не делаем
         if (units.isEmpty() && noHaveMoney(GameBuildings.STABLE.getCost() + GameUnits.SPEARMAN.getCost())) {
             return;
-        } else if(!noHaveMoney(GameBuildings.STABLE.getCost() + GameUnits.SPEARMAN.getCost())){
+        }
+
+        // Только раз в n ходов покупаем здание и юнитов
+        if (!noHaveMoney(GameBuildings.STABLE.getCost() + GameUnits.SPEARMAN.getCost()) && turnCounter % 2 == 0) {
             autoBuy(field);
         }
 
         // Проверка на вражеского героя в радиусе 2 клеток
-        for (int dx = -2; dx <= 2; dx++) {
-            for (int dy = -2; dy <= 2; dy++) {
-                Position newPos = new Position(position.x() + dx, position.y() + dy);
-                HumanHero player = field.getHumanHeroAt(newPos); // Проверяем каждую позицию в радиусе
+        if (attackNearbyPlayerIfExists(field)) return;
 
-                if (player != null && movementPoints > 0) {
-                    this.attack(player); // Атака игрока, если он найден в пределах 2 клеток
-                    spendMovementPoints(1);
-                    return; // После атаки сразу выходим, так как бот не будет двигаться дальше в этом ходу
-                }
-            }
-        }
-
-        // Атака замка, если на его позиции
+        // Атака замка
         Castle enemyCastle = field.getCastleAt(targetCastle);
         if (enemyCastle != null) {
             Position castlePos = enemyCastle.getPosition();
@@ -70,7 +71,8 @@ public class ComputerHero extends Hero {
 
             if (dx <= 1 && dy <= 1) {
                 enemyCastle.takeDamage(power);
-                System.out.println("Компьютер атакует ваш замок с позиции " + position + ", у него осталось " + enemyCastle.getHealth() + " hp!");
+                log("Компьютер атакует ваш замок с позиции " + position +
+                        ", у него осталось " + enemyCastle.getHealth() + " hp!");
             }
         }
 
@@ -78,34 +80,109 @@ public class ComputerHero extends Hero {
 
     }
 
+    private void handleRevive(Field field) {
+        Position respawn = new Position(9, 9);
+        field.moveObject(this, this.position.x(), this.position.y(), respawn.x(), respawn.y());
+        this.position = respawn;
+        this.setUnits(new ArrayList<>());
+        log("Герой компьютера возрожден на позиции (9,9)");
+    }
+
+    private boolean attackNearbyPlayerIfExists(Field field) {
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dy = -2; dy <= 2; dy++) {
+                Position newPos = new Position(position.x() + dx, position.y() + dy);
+                HumanHero player = field.getHumanHeroAt(newPos);
+                if (player != null && movementPoints > 0) {
+                    this.attack(player);
+                    spendMovementPoints(1);
+                    log("Компьютер атаковал игрока на позиции " + newPos);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
     private void autoBuy(Field field) {
+        buildStableIfNeeded();
+        buyFirstSpearmanIfNeeded();
+        buildPreferredOrRandomBuilding();
+        buyAvailableUnits();
+    }
+
+    private void buildStableIfNeeded() {
         if (!stableBought && !noHaveMoney(GameBuildings.STABLE.getCost())) {
             myCastle.addBuilding(GameBuildings.STABLE);
             spendMoney(GameBuildings.STABLE.getCost());
             stableBought = true;
-            System.out.println("Компьютер построил конюшню.");
+            log("Компьютер построил конюшню.");
         }
+    }
 
+    private void buyFirstSpearmanIfNeeded() {
         if (!firstUnitBought && !noHaveMoney(GameUnits.SPEARMAN.getCost())) {
             Unit u = GameUnits.SPEARMAN.clone();
             spendMoney(u.getCost());
             addUnits(u);
             firstUnitBought = true;
-            System.out.println("Компьютер купил первого юнита.");
+            log("Компьютер купил первого копейщика.");
         }
+    }
 
-        List<Unit> unitPool = new ArrayList<>(List.of(
-                GameUnits.PALADIN, GameUnits.CAVALRYMAN,
-                GameUnits.SWORDSMAN, GameUnits.CROSSBOWMAN,
-                GameUnits.SPEARMAN
-        ));
-
+    private void buildPreferredOrRandomBuilding() {
         Random rand = new Random();
 
+        if (!myCastle.contains(GameBuildings.TAVERN) && !noHaveMoney(GameBuildings.TAVERN.getCost())) {
+            myCastle.addBuilding(GameBuildings.TAVERN);
+            spendMoney(GameBuildings.TAVERN.getCost());
+            log("Компьютер построил таверну.");
+            return;
+        }
+
+        List<BuildingCastle> buildingPool = new ArrayList<>(List.of(
+                GameBuildings.GUARD_POST,
+                GameBuildings.ARMORY,
+                GameBuildings.ARENA,
+                GameBuildings.CATHEDRAL,
+                GameBuildings.CROSSBOWMENS_TOWER
+        ));
+        buildingPool.removeIf(b -> myCastle.contains(b) || noHaveMoney(b.getCost()));
+
+        if (!buildingPool.isEmpty()) {
+            BuildingCastle chosen = buildingPool.get(rand.nextInt(buildingPool.size()));
+            myCastle.addBuilding(chosen);
+            spendMoney(chosen.getCost());
+            System.out.println("Компьютер построил здание: " + chosen.getClass().getSimpleName());
+        }
+    }
+
+    private void buyAvailableUnits() {
+        Random rand = new Random();
+
+        List<Unit> unitPool = new ArrayList<>();
+
+        if (myCastle.contains(GameBuildings.CATHEDRAL)) {
+            unitPool.add(GameUnits.PALADIN);
+        }
+        if (myCastle.contains(GameBuildings.ARENA)) {
+            unitPool.add(GameUnits.CAVALRYMAN);
+        }
+        if (myCastle.contains(GameBuildings.ARMORY)) {
+            unitPool.add(GameUnits.SWORDSMAN);
+        }
+        if (myCastle.contains(GameBuildings.CROSSBOWMENS_TOWER)) {
+            unitPool.add(GameUnits.CROSSBOWMAN);
+        }
+        if (myCastle.contains(GameBuildings.GUARD_POST)) {
+            unitPool.add(GameUnits.SPEARMAN);
+        }
+
         while (!unitPool.isEmpty()) {
-            Unit base = unitPool.get(rand.nextInt(unitPool.size())); // случайный юнит
+            Unit base = unitPool.get(rand.nextInt(unitPool.size()));
             if (noHaveMoney(base.getCost())) {
-                unitPool.remove(base); // Если не можем купить — удаляем из пула
+                unitPool.remove(base);
                 continue;
             }
 
@@ -116,6 +193,7 @@ public class ComputerHero extends Hero {
                     ". Сила героя: " + this.getPower());
         }
     }
+
 
     private void moveTowardsCastle(Field field) {
         if (getPosition().equals(targetCastle)) {
@@ -164,9 +242,6 @@ public class ComputerHero extends Hero {
         return moved;
     }
 
-    @Override
-    public void interact(Hero player) {
-    }
     public String serialize() {
         // Пример: просто сохраняем имя героя (или другое состояние)
         return this.name; // или другое нужное тебе поле
@@ -182,4 +257,64 @@ public class ComputerHero extends Hero {
 
         return hero;
     }
+
+    private boolean shouldBuyHero() {
+        // Проверяем, есть ли таверна
+        if (!myCastle.contains(GameBuildings.TAVERN)) {
+            return false;
+        }
+
+        // Проверяем, достаточно ли золота
+        if (gold < MIN_GOLD_FOR_HERO) {
+            return false;
+        }
+
+        // Проверяем шанс покупки
+        return Math.random() < HERO_PURCHASE_CHANCE;
+    }
+
+    private void buyRandomHero(Field field) {
+        Position castlePos = myCastle.getPosition();
+        Position spawnPos = field.findFreeAdjacent(castlePos);
+
+        if (spawnPos == null) {
+            return;
+        }
+
+        // Выбираем случайного героя
+        PurchasableHero newHero = null;
+        int heroType = (int) (Math.random() * 3);
+
+        switch (heroType) {
+            case 0: // Эльф
+                if (gold >= 120) {
+                    newHero = new ElfHero(spawnPos, "\u001B[95m", myCastle, 3, 1, 120, this);
+                    spendMoney(120);
+                }
+                break;
+            case 1: // Орк
+                if (gold >= 100) {
+                    newHero = new OrcHero(spawnPos, "\u001B[95m", myCastle, 2, 1, 100, this);
+                    spendMoney(100);
+                }
+                break;
+            case 2: // Гном
+                if (gold >= 90) {
+                    newHero = new DwarfHero(spawnPos, "\u001B[95m", myCastle, 1, 2, 90, this);
+                    spendMoney(90);
+                }
+                break;
+        }
+
+        if (newHero != null) {
+            field.getCell(spawnPos.x(), spawnPos.y()).addObject(newHero);
+            field.addHeroToAll(newHero);
+            log("Компьютер нанял " + newHero.getClass().getSimpleName() + "!");
+        }
+    }
+
+    private void log(String msg) {
+        System.out.println("[AI] " + msg);
+    }
+
 }

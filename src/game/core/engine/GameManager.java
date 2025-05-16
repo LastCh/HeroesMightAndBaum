@@ -11,8 +11,8 @@ import java.util.Scanner;
 
 public class GameManager {
     private final Field field;
-    private HumanHero human;         // убрал final
-    private ComputerHero computer;   // убрал final
+    private HumanHero human;        
+    private ComputerHero computer;   
     private final Scanner scanner = new Scanner(System.in);
     private final Castle botCastle;
     private final Castle playerCastle;
@@ -75,6 +75,5 @@ public class GameManager {
     public void loadGame(HumanHero hplayer, ComputerHero cplayer) {
         this.human = hplayer;
         this.computer = cplayer;
-        // Можно дополнительно обновить объекты на поле field, если нужно
     }
 }

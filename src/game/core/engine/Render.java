@@ -88,7 +88,7 @@ public class Render {
                         int x = scanner.nextInt();
                         System.out.print("Y: ");
                         int y = scanner.nextInt();
-                        scanner.nextLine(); // Очистка сканнера после чисел
+                        scanner.nextLine();
 
                         Position position = new Position(x, y);
                         Hero enemy = field.getHeroAt(position);
@@ -156,6 +156,7 @@ public class Render {
         for (PurchasableHero hero : heroes) {
             if (hero.isAlive()) {
                 hero.makeMove(field);  // Пусть каждый герой сделает свой ход
+                hero.resetMovementPoints();
             }else{
                 field.removePlayer(hero);
             }

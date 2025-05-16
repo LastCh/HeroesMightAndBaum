@@ -32,9 +32,6 @@ public class GoldCave extends FieldObject implements Immovable {
 
     }
 
-    @Override
-    public void interact(Hero player) {}
-
     public void interact(HumanHero player) {
         if (completed) {
             System.out.println("Пещера уже очищена.");

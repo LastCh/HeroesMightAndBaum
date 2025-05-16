@@ -5,7 +5,6 @@ import game.api.Position;
 import game.api.FieldObject;
 import game.map.Field;
 import game.model.building.incastle.BuildingCastle;
-import game.model.hero.Hero;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -51,11 +50,6 @@ public class Castle extends FieldObject implements Immovable {
 
     public boolean isDestroyed() {
         return health <= 0;
-    }
-
-    @Override
-    public void interact(Hero player) {
-
     }
 
     public Field getField() {

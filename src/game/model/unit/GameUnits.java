@@ -7,5 +7,5 @@ public final class GameUnits {
     public static final Cavalryman CAVALRYMAN = new Cavalryman();
     public static final Paladin PALADIN = new Paladin();
 
-    private GameUnits() {}
+    private GameUnits() { }
 }

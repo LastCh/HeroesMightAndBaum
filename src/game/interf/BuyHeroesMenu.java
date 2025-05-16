@@ -4,10 +4,6 @@ import game.api.Position;
 import game.map.Field;
 import game.model.hero.*;
 
-import java.util.List;
-import java.util.ArrayList;
-
-
 public class BuyHeroesMenu extends Inter {
 
     public BuyHeroesMenu() { }
@@ -44,7 +40,7 @@ public class BuyHeroesMenu extends Inter {
                 Position spawnPos = field.findFreeAdjacent(castlePos);
 
                 if (spawnPos != null) {
-                    PurchasableHero elf = new ElfHero(spawnPos, player.getDirection(), GREEN, player.getMyCastle(), 3, 6, 120, player);
+                    PurchasableHero elf = new ElfHero(spawnPos, player.getMyCastle(), 3, 6, 120, player);
                     field.getCell(spawnPos.x(), spawnPos.y()).addObject(elf);
                     field.addHeroToAll(elf);
                     player.spendMoney(120);
@@ -66,7 +62,7 @@ public class BuyHeroesMenu extends Inter {
                 spawnPos = field.findFreeAdjacent(castlePos);
 
                 if (spawnPos != null) {
-                    PurchasableHero orc = new OrcHero(spawnPos, player.getDirection(), GREEN, player.getMyCastle(), 2, 5, 100, player);
+                    PurchasableHero orc = new OrcHero(spawnPos, player.getMyCastle(), 2, 5, 100, player);
                     field.getCell(spawnPos.x(), spawnPos.y()).addObject(orc);
                     field.addHeroToAll(orc);
                     player.spendMoney(100);
@@ -88,7 +84,7 @@ public class BuyHeroesMenu extends Inter {
                 spawnPos = field.findFreeAdjacent(castlePos);
 
                 if (spawnPos != null) {
-                    PurchasableHero dwarf = new DwarfHero(spawnPos, player.getDirection(), GREEN, player.getMyCastle(), 1, 4, 90, player);
+                    PurchasableHero dwarf = new DwarfHero(spawnPos, player.getMyCastle(), 1, 4, 90, player);
                     field.getCell(spawnPos.x(), spawnPos.y()).addObject(dwarf);
                     field.addHeroToAll(dwarf);
                     player.spendMoney(90);

@@ -1,7 +1,5 @@
 package game.api;
 
-import game.model.hero.Hero;
-
 public abstract class FieldObject {
     protected Position position;
     protected String coloredSymbol;
@@ -28,6 +26,4 @@ public abstract class FieldObject {
     public int getPriority() {
         return priority;
     }
-
-    public abstract void interact(Hero player);
 }

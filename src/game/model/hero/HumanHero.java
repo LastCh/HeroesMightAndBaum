@@ -1,6 +1,5 @@
 package game.model.hero;
 
-import game.api.Direction;
 import game.api.FieldObject;
 import game.api.Position;
 import game.map.Field;
@@ -21,12 +20,8 @@ public class HumanHero extends Hero {
     private String name;
 
     public HumanHero(Position startPosition, int points, Castle castle, int gold) {
-        super(startPosition, Direction.UP, COLOR, castle, 10, points, gold);
-    }
-
-    @Override
-    public void interact(Hero player) {
-        System.out.println("Игрок взаимодействует с другим игроком.");
+        super(startPosition, COLOR, castle, 10, points, gold);
+        this.movementPoints = points;
     }
 
     public void move(int dx, int dy, Field field, int d) {
@@ -131,7 +126,7 @@ public class HumanHero extends Hero {
     public boolean castleCheck(Field field, Position newPos) {
         Castle castle = field.getCastleAt(newPos);
         if (castle != null) {
-            if (castle != myCastle) { // Атакуем только ЧУЖИЕ замки
+            if (castle != myCastle) {
                 castle.takeDamage(power);
                 System.out.println("Вы атакуете вражеский замок!");
             } else {
@@ -145,10 +140,6 @@ public class HumanHero extends Hero {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void makeMove(Field field) {
     }
 
     public boolean isValidPosition(Position newPos) {

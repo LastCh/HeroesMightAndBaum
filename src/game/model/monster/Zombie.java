@@ -8,7 +8,7 @@ public class Zombie extends Hero {
 
     public Zombie(Position position, int health) {
         // Зомби без замка, без владельца, без команды
-        super(position, null, "\u001B[32mZ\u001B[0m", null, 0, 0, 0);
+        super(position, "\u001B[32mZ\u001B[0m", null, 0, 0, 0);
         this.setHealth(health);
         this.power = 10;
     }
@@ -16,10 +16,6 @@ public class Zombie extends Hero {
     public void makeMove() {
     }
 
-    @Override
-    public void interact(Hero player) {
-        // Зомби не инициирует взаимодействие
-    }
 
     @Override
     public void takeDamage(int amount) {

@@ -1,6 +1,5 @@
 package game.model.hero;
 
-import game.api.Direction;
 import game.api.Position;
 import game.map.Field;
 import game.model.building.onmap.Castle;
@@ -8,12 +7,13 @@ import game.model.unit.GameUnits;
 import game.model.unit.Unit;
 
 public abstract class PurchasableHero extends Hero {
-    protected final Hero owner; // Индивидуальный владелец
-    private boolean preferX = true;
+    protected final Hero owner;
+    protected boolean preferX = true;
+    protected String color;
 
-    public PurchasableHero(Position position, Direction direction, String color, Castle castle,
+    public PurchasableHero(Position position, String color, Castle castle,
                            int movement, int points, int gold, Hero owner) {
-        super(position, direction, color, castle, movement, points, gold);
+        super(position, color, castle, movement, points, gold);
         this.owner = owner;
     }
 
@@ -26,11 +26,14 @@ public abstract class PurchasableHero extends Hero {
             for (int dy = -1; dy <= 1; dy++) {
                 Position newPos = new Position(position.x() + dx, position.y() + dy);
                 if((owner.getPosition().x() != newPos.x()) && (owner.getPosition().y() != newPos.y())) {
-                    Hero player = field.getEnemyHeroAt(newPos); // Проверяем каждую позицию в радиусе
-                    if (player != null && movementPoints > 0) {
-                        this.attack(player); // Атака игрока, если он найден в пределах 2 клеток
+                    Hero player = field.getEnemyHeroAt(newPos);
+                    if (player != null && movementPoints > 0 && !field.isAlly(this, player)) {
+                        System.out.println(this.getClass().getSimpleName() + " (" + this.getOwner().getClass().getSimpleName() +
+                                ") атакует " + player.getClass().getSimpleName() +
+                                " (" + player.getOwner() + ")");
+                        this.attack(player);
                         spendMovementPoints(1);
-                        return; // После атаки сразу выходим, так как бот не будет двигаться дальше в этом ходу
+                        return;
                     }
                 }
             }
@@ -101,15 +104,7 @@ public abstract class PurchasableHero extends Hero {
     }
 
     @Override
-    public void interact(Hero otherHero) {
-        // Логика взаимодействия с другими героями
-        if (otherHero == owner) return; // Не атакуем своего владельца
-        if (otherHero instanceof PurchasableHero pHero && pHero.owner == this.owner) return; // Не атакуем союзников
+    public Hero getOwner() { return owner; }
 
-        this.attack(otherHero); // Если это не свой или союзный герой — атакуем
-    }
-
-    public Hero getOwner() {
-        return owner;
-    }
+    public abstract String getColor();
 }

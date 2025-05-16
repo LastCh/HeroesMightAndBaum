@@ -9,10 +9,7 @@ import game.model.hero.HumanHero;
 import game.model.hero.Hero;
 import game.model.hero.PurchasableHero;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class Field {
     private final int width;
@@ -229,7 +226,7 @@ public class Field {
     }
 
     // Проверка союзников
-    private boolean isAlly(Hero a, Hero b) {
+    public boolean isAlly(Hero a, Hero b) {
         if (a == b) return true;
         if (a instanceof PurchasableHero pHero && pHero.getOwner() == b) return true;
         if (b instanceof PurchasableHero pHero && pHero.getOwner() == a) return true;
@@ -241,15 +238,22 @@ public class Field {
         int[] dx = {-1, 0, 1, 0};
         int[] dy = {0, -1, 0, 1};
 
+        List<Position> candidates = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             int nx = center.x() + dx[i];
             int ny = center.y() + dy[i];
             Cell cell = getCell(nx, ny);
-            if (cell != null) {
-                return new Position(nx, ny);
+            if (cell != null && cell.isEmpty()) {
+                candidates.add(new Position(nx, ny));
             }
         }
+        System.out.println("Найдено " + candidates.size() + " свободных клеток для спавна.");
+        if (!candidates.isEmpty()) {
+            return candidates.get(new Random().nextInt(candidates.size()));
+        }
         return null;
+
     }
+
 
 }

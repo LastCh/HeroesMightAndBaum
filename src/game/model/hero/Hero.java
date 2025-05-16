@@ -1,7 +1,5 @@
 package game.model.hero;
 
-import game.api.Direction;
-import game.api.Movable;
 import game.api.Position;
 import game.api.FieldObject;
 import game.map.Field;
@@ -10,9 +8,8 @@ import game.model.building.onmap.Castle;
 import game.model.unit.Unit;
 import java.util.ArrayList;
 
-public abstract class Hero extends FieldObject implements Movable {
+public abstract class Hero extends FieldObject {
     protected ArrayList<Unit> units = new ArrayList<>();
-    protected Direction direction;
     protected Castle myCastle;
     protected int maxMovementPoints;
     protected int movementPoints;
@@ -23,13 +20,13 @@ public abstract class Hero extends FieldObject implements Movable {
     protected double accumulatedMovementCoef = 0.0;
     protected boolean speedStableBonus = false;
     protected Castle castle;
+    protected boolean deathCooldown = false;
 
-    public Hero(Position startPosition, Direction startDirection, String colorCode, Castle castle,
+    public Hero(Position startPosition, String colorCode, Castle castle,
                 int priority, int points, int gold) {
         super(startPosition, colorCode + "☻" + " " + "\u001B[0m", priority);
-        this.direction = startDirection;
         this.maxMovementPoints = points;
-        this.movementPoints = points;
+        this.movementPoints = 0;
         this.health = 100;  // Добавить
         this.power = 0;
         this.coloredSymbol = colorCode + "☻" + " " + "\u001B[0m";
@@ -133,74 +130,37 @@ public abstract class Hero extends FieldObject implements Movable {
         this.power += unit.getPower(); // Обновляем силу
     }
 
-    public void setGold(int count) {
-        this.gold = count;
-    }
+    public void setGold(int count) { this.gold = count; }
 
-    public int getGold() {
-        return this.gold;
-    }
+    public int getGold() { return this.gold; }
 
-    public Castle getMyCastle() {
-        return this.myCastle;
-    }
+    public Castle getMyCastle() { return this.myCastle; }
 
-    public boolean isAlive() {
-        return health > 0;
-    }
+    public boolean isAlive() { return health > 0; }
 
-    @Override
     public void move(int dx, int dy, Field field) {
         updatePosition(position.x() + dx, position.y() + dy);
     }
 
-    public void updatePosition(int newX, int newY) {
-        this.position = new Position(newX, newY);
-    }
+    public void updatePosition(int newX, int newY) { this.position = new Position(newX, newY); }
 
     @Override
-    public void turn(Direction direction) {
-        this.direction = direction;
-    }
+    public Position getPosition() { return position; }
 
     @Override
-    public Position getPosition() {
-        return position;
-    }
+    public String getColoredSymbol() { return String.format("%-3s", coloredSymbol); }
 
-    @Override
-    public Direction getDirection() {
-        return direction;
-    }
+    public void setHealth(int newHealth) { health = newHealth; }
 
-    @Override
-    public String getColoredSymbol() {
-        return String.format("%-3s", coloredSymbol); // Фиксированная ширина в 3 символа
-    }
+    public int getHealth() { return health; }
 
-    public void setHealth(int newHealth) {
-        health = newHealth;
-    }
+    public void setPower(int newPower) { power = newPower; }
 
-    public int getHealth() {
-        return health;
-    }
+    public int getPower() { return power; }
 
-    public void setPower(int newPower) {
-        power = newPower;
-    }
+    public int getMovementPoints() { return movementPoints; }
 
-    public int getPower() {
-        return power;
-    }
-
-    public int getMovementPoints() {
-        return movementPoints;
-    }
-
-    public void spendMovementPoints(int points) {
-        movementPoints -= points;
-    }
+    public void spendMovementPoints(int points) { movementPoints -= points; }
 
     public void resetMovementPoints() {
         movementPoints = maxMovementPoints;
@@ -208,30 +168,21 @@ public abstract class Hero extends FieldObject implements Movable {
         accumulatedMovementCoef = 0.0;
     }
 
-    public ArrayList<Unit> getUnits() {
-        return units;
-    }
+    public Hero getOwner() { return this; }
 
-    public void setUnits(ArrayList<Unit> uni) {
-        this.units = uni;
-    }
+    public ArrayList<Unit> getUnits() { return units; }
 
-    public boolean noHaveMoney(int cost) {
-        return !(this.gold >= cost);
-    }
+    public void setUnits(ArrayList<Unit> uni) { this.units = uni; }
 
-    public void addGold(int money) {
-        gold += money;
-    }
+    public boolean noHaveMoney(int cost) { return !(this.gold >= cost); }
 
-    public void spendMoney(int cost) {
-        gold -= cost;
-    }
+    public void addGold(int money) { gold += money; }
 
-    public Field getField() {
-        return castle.getField(); // Предполагается, что Castle имеет поле типа Field
-    }
+    public void spendMoney(int cost) { gold -= cost; }
 
-    public void makeMove(Field field) {
-    }
+    public Field getField() { return castle.getField(); }
+
+    public boolean isInDeathCooldown() { return deathCooldown; }
+
+    public void setDeathCooldown(boolean state) { this.deathCooldown = state; }
 }
