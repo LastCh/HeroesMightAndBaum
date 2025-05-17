@@ -3,144 +3,120 @@ package game.model.building.onmap;
 import game.api.FieldObject;
 import game.api.Immovable;
 import game.api.Position;
+import game.interf.CaveInterface;
 import game.map.DungeonField;
 import game.model.hero.HumanHero;
 import game.model.monster.Zombie;
 import game.model.hero.Hero;
 
-import java.util.Scanner;
-
 public class GoldCave extends FieldObject implements Immovable {
     private final int goldAmount;
-    private boolean completed = false;
-    private DungeonField dungeonField;
     private boolean inCave = false;
-    private final Scanner scanner = new Scanner(System.in);
+    private final DungeonField dungeonField;
     private final Position caveEntry = new Position(0, 0);
+    private int artifactUses;
+    private final CaveInterface ui = new CaveInterface();
 
     public GoldCave(Position position, int goldAmount) {
-        super(position, "\u001B[33m" + "\u001B[41m" + "💰" + "\u001B[0m", 4);
+        super(position, "\u001B[33m\u001B[41m💰\u001B[0m", 4);
         this.goldAmount = goldAmount;
-        int min = 1;
-        int max = 500;
-        int randomNumber = (int)(Math.random() * (max - min + 1)) + min;
-        goldAmount = randomNumber;
-
-        // Создаем мини-подземелье 5x5
-        dungeonField = new DungeonField(5, 5);
-        dungeonField.AddZombies();
-
+        this.dungeonField = new DungeonField(5, 5);
+        int zombiesCount = dungeonField.addZombies();
+        artifactUses = zombiesCount - 1;
     }
 
     public void interact(HumanHero player) {
-        System.out.println("Игрок входит в Золотую пещеру!");
+        inCave = true;
+        ui.print("\nИгрок входит в Золотую пещеру!");
         player.setPosition(caveEntry);
         dungeonField.getCell(caveEntry.x(), caveEntry.y()).addObject(player);
-        inCave = true;
 
         while (true) {
-            clearConsole();
             dungeonField.render();
-            System.out.println("Вы находитесь в клетке: " + player.getPosition());
-            System.out.println("Выберите действие:");
-            System.out.println("[W] Вверх");
-            System.out.println("[S] Вниз");
-            System.out.println("[A] Влево");
-            System.out.println("[D] Вправо");
-            System.out.println("[L] Сдаться и выйти (без награды)");
+            ui.print("Вы находитесь в клетке: (" + player.getPosition().x() + ";" + player.getPosition().y() + ")");
+            ui.showPrompt();
 
-            String input = scanner.nextLine().trim().toUpperCase();;
+            String input = ui.readAction();
+            int dx = 0, dy = 0;
 
             switch (input) {
-                case "W" -> {
-                    player.moveInCave(0, -1, dungeonField);
-                    if (areAllZombiesDead()) {
-                        System.out.println("Вы победили всех зомби и получаете артефакт!");
-                        player.receiveArtifact();
-                        completed = true;
-                        removePlayerFromCave(player);
-                        return;
-                    }
-                }
-                case "S" ->{
-                    player.moveInCave(0, 1, dungeonField);
-                    if (areAllZombiesDead()) {
-                        System.out.println("Вы победили всех зомби и получаете артефакт!");
-                        player.receiveArtifact();
-                        completed = true;
-                        removePlayerFromCave(player);
-                        return;
-                    }
-                }
-                case "A" -> {
-                    player.moveInCave(-1, 0, dungeonField);
-                    if (areAllZombiesDead()) {
-                        System.out.println("Вы победили всех зомби и получаете артефакт!");
-                        player.receiveArtifact();
-                        completed = true;
-                        removePlayerFromCave(player);
-                        return;
-                    }
-                }
-                case "D" -> {
-                    player.moveInCave(1, 0, dungeonField);
-                    if (areAllZombiesDead()) {
-                        System.out.println("Вы победили всех зомби и получаете артефакт!");
-                        player.receiveArtifact();
-                        completed = true;
-                        removePlayerFromCave(player);
-                        return;
-                    }
-                }
+                case "W" -> dy = -1;
+                case "S" -> dy = 1;
+                case "A" -> dx = -1;
+                case "D" -> dx = 1;
                 case "L" -> {
-                    System.out.println("Вы покинули пещеру.");
                     removePlayerFromCave(player);
                     return;
                 }
-                default -> System.out.println("Неизвестная команда.");
+                default -> {
+                    ui.print("Неизвестная команда.");
+                    continue;
+                }
             }
 
-            if (areAllZombiesDead()) {
-                System.out.println("Вы победили всех зомби и получаете "+ goldAmount +" золота с артефактом!");
-                player.receiveArtifact();
-                player.addGold(goldAmount);
-                completed = true;
+            player.moveInCave(dx, dy, dungeonField);
+            dungeonField.zombiesTurn(player);
+            ui.waitMillis(1000);
+
+            ui.clearConsole();
+            dungeonField.render();
+
+            if (!player.isAlive()) {
+                ui.print("Вы погибли в пещере!");
+                ui.waitMillis(1000);
                 removePlayerFromCave(player);
                 return;
             }
-        }
 
+            if (areAllZombiesDead()) {
+                ui.clearConsole();
+                ui.print("Вы победили всех зомби и получаете золото и артефакты!");
+                ui.waitMillis(1000);
+                player.receiveArtifact(artifactUses);
+                player.addGold(getGoldAmount());
+                removePlayerFromCave(player);
+                return;
+            }
+
+            ui.clearConsole();
+        }
     }
 
     private boolean areAllZombiesDead() {
-        for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 5; y++) {
-                for (FieldObject obj : dungeonField.getCell(x, y).getObjects()) {
-                    if (obj instanceof Zombie zombie && !zombie.isDead()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return dungeonField.getZombies().stream().allMatch(Zombie::isDead);
     }
 
     private void removePlayerFromCave(Hero player) {
         dungeonField.getCell(player.getPosition().x(), player.getPosition().y()).removeObject(player);
-        inCave = false;
-        // Можно вернуть игрока в исходную точку карты
         player.setPosition(this.getPosition());
-    }
-
-    public boolean isInCave() {
-        return inCave;
     }
 
     public int getGoldAmount() {
         return goldAmount;
     }
 
-    private void clearConsole() {
-        for (int i = 0; i < 50; i++) System.out.println();
+    public boolean isInCave() {
+        return inCave;
     }
+
+    @Override
+    public String getClassName() {
+        return "GoldCave";
+    }
+
+    @Override
+    public String serialize() {
+        return position.x() + "," + position.y() + ";" + getGoldAmount();
+    }
+
+    public static GoldCave deserialize(String data) {
+        String[] parts = data.split(";");
+        String[] coords = parts[0].split(",");
+        int x = Integer.parseInt(coords[0]);
+        int y = Integer.parseInt(coords[1]);
+        int gold = Integer.parseInt(parts[1]);
+
+        return new GoldCave(new Position(x, y), gold);
+    }
+
 }

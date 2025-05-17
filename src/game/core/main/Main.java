@@ -1,6 +1,5 @@
 package game.core.main;
 
-import game.core.engine.Render;
 import game.interf.MenuManager;
 
 public class Main {

@@ -14,4 +14,6 @@ public class Cathedral extends BuildingCastle {
     public static String getName() {
         return name;
     }
+
+    public String getNameNotStat() { return name; }
 }

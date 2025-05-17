@@ -1,130 +1,31 @@
 package game.model.hero;
-/*
-import game.api.Direction;
-import game.api.Position;
-import game.map.Field;
-import game.model.building.onmap.Castle;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-import java.util.Scanner;
+import game.map.Field;
+import game.model.hero.HumanHero;
+import game.model.unit.GameUnits;
+import game.api.Position;
+import game.model.building.onmap.Castle;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HeroTest {
-    private TestHero player;
-    private Field field;
-    private Castle castle;
 
-    // Вспомогательный класс для тестирования
-    private static class TestHero extends Hero {
-        public TestHero(Position startPosition, Direction startDirection, String colorCode, Castle castle) {
-            super(startPosition, startDirection, colorCode, castle, 1, 5, 100);
-        }
+    static Field field;
 
-        @Override
-        public void interact(Hero player) {
-            // Пустая реализация для тестов
-        }
-    }
-
-    @BeforeEach
-    void setUp() {
-        // Создаем сканер для конструктора Castle
-        field = new Field(10, 10);
-        Scanner scanner = new Scanner(System.in);
-        castle = new Castle(new Position(0, 0), scanner, 0, field); // Используем правильный конструктор
-        player = new TestHero(new Position(2, 2), Direction.UP, "RED", castle);
-
+    @BeforeAll
+    static void beforeAllTests() {
+        field = new Field(5,5);
     }
 
     @Test
-    void testInitialPosition() {
-        assertEquals(new Position(2, 2), player.getPosition());
-    }
+    void testAddUnitsIncreasesPower() {
+        Castle castle = new Castle(new Position(0, 0), "\u001B[31;47m", 1, field);
+        HumanHero hero = new HumanHero(new Position(1, 1), 10, castle,  100);
 
-    @Test
-    void testMove() {
-        player.move(1, 0, field); // Движение вправо
-        assertEquals(new Position(3, 2), player.getPosition());
-
-        player.move(0, 1, field); // Движение вниз (DOWN)
-        assertEquals(new Position(3, 3), player.getPosition());
-    }
-
-    @Test
-    void testTurn() {
-        player.turn(Direction.RIGHT);
-        assertEquals(Direction.RIGHT, player.getDirection());
-
-        player.turn(Direction.DOWN);
-        assertEquals(Direction.DOWN, player.getDirection());
-    }
-
-    @Test
-    void testMovementPoints() {
-        assertEquals(5, player.getMovementPoints());
-
-        player.spendMovementPoints(2);
-        assertEquals(3, player.getMovementPoints());
-
-        player.resetMovementPoints();
-        assertEquals(5, player.getMovementPoints());
-    }
-
-    @Test
-    void testAttack() {
-        TestHero enemy = new TestHero(new Position(2, 3), Direction.DOWN, "BLUE", castle);
-        int initialHealth = enemy.getHealth();
-
-        player.attack(enemy);
-        assertEquals(initialHealth - player.getPower(), enemy.getHealth());
-    }
-
-    @Test
-    void testTakeDamage() {
-        int initialHealth = player.getHealth();
-        player.takeDamage(3);
-        assertEquals(initialHealth - 3, player.getHealth());
-    }
-
-    @Test
-    void testIsAlive() {
-        assertTrue(player.isAlive());
-        player.takeDamage(player.getHealth() + 1);
-        assertFalse(player.isAlive());
-    }
-
-    @Test
-    void testIsInRange() {
-        TestHero nearbyPlayer = new TestHero(new Position(3, 3), Direction.LEFT, "BLUE", castle);
-        TestHero farPlayer = new TestHero(new Position(10, 10), Direction.LEFT, "BLUE", castle);
-
-        assertTrue(player.isInRange(nearbyPlayer, 2));
-        assertFalse(player.isInRange(farPlayer, 2));
-    }
-
-    @Test
-    void testGoldManagement() {
-        assertEquals(100, player.getGold());
-        player.setGold(150);
-        assertEquals(150, player.getGold());
-    }
-
-    @Test
-    void testDirectionDeltas() {
-        assertEquals(0, Direction.UP.dx);
-        assertEquals(-1, Direction.UP.dy);
-
-        assertEquals(1, Direction.RIGHT.dx);
-        assertEquals(0, Direction.RIGHT.dy);
-    }
-
-    @Test
-    void testFromDeltaMethod() {
-        assertEquals(Direction.UP, Direction.fromDelta(0, -1));
-        assertEquals(Direction.RIGHT, Direction.fromDelta(1, 0));
-        assertThrows(IllegalArgumentException.class, () -> Direction.fromDelta(2, 2));
+        int powerBefore = hero.getPower();
+        hero.addUnits(GameUnits.SPEARMAN.clone());
+        assertTrue(hero.getPower() > powerBefore);
     }
 }
-*/

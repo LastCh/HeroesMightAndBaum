@@ -14,4 +14,6 @@ public class CrossbowmensTower extends BuildingCastle {
     public static String getName() {
         return name;
     }
+
+    public String getNameNotStat() { return name; }
 }

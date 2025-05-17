@@ -86,7 +86,7 @@ public class BuyUnitMenu extends Inter {
 
         if (!player.getMyCastle().contains(requiredBuilding)) {
             showGold.run();
-            System.out.println(RED + "❌ Требуется " + requiredBuilding.getName() + "!" + RESET);
+            System.out.println(RED + "❌ Требуется " + requiredBuilding.getNameNotStat() + "!" + RESET);
             return choice;
         }
 

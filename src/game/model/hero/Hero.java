@@ -5,7 +5,8 @@ import game.api.FieldObject;
 import game.map.Field;
 import game.model.building.incastle.GameBuildings;
 import game.model.building.onmap.Castle;
-import game.model.unit.Unit;
+import game.model.unit.*;
+
 import java.util.ArrayList;
 
 public abstract class Hero extends FieldObject {
@@ -129,6 +130,35 @@ public abstract class Hero extends FieldObject {
         this.units.add(unit);
         this.power += unit.getPower(); // Обновляем силу
     }
+
+    protected String serializeUnits() {
+        StringBuilder sb = new StringBuilder();
+        for (Unit unit : units) {
+            sb.append(unit.getClass().getSimpleName()).append(";");
+        }
+        return sb.toString();
+    }
+
+    protected void deserializeUnits(String data) {
+        units.clear();
+        if (data == null || data.isEmpty()) return;
+
+        String[] parts = data.split(";");
+        for (String unitName : parts) {
+            Unit unit = switch (unitName) {
+                case "Swordsman" -> new Swordsman();
+                case "Spearman" -> new Spearman();
+                case "Cavalryman" -> new Cavalryman();
+                case "Crossbowman" -> new Crossbowman();
+                case "Paladin" -> new Paladin();
+                default -> null;
+            };
+            if (unit != null) {
+                this.addUnits(unit);
+            }
+        }
+    }
+
 
     public void setGold(int count) { this.gold = count; }
 

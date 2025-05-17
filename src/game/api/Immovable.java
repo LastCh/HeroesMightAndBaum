@@ -1,5 +1,4 @@
 package game.api;
-import game.model.hero.Hero;
 
 public interface Immovable {
 

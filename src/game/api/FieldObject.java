@@ -26,4 +26,8 @@ public abstract class FieldObject {
     public int getPriority() {
         return priority;
     }
+
+    // 👇 ОБЯЗАТЕЛЬНО ДОБАВЬ ЭТИ МЕТОДЫ
+    public abstract String serialize();           // состояние объекта
+    public abstract String getClassName();        // имя класса для восстановления
 }

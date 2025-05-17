@@ -245,21 +245,59 @@ public class ComputerHero extends Hero {
         return moved;
     }
 
+    @Override
     public String serialize() {
-        // Пример: просто сохраняем имя героя (или другое состояние)
-        return this.name; // или другое нужное тебе поле
+        return name + ";" +
+                health + ";" +
+                gold + ";" +
+                stableBought + ";" +
+                firstUnitBought + ";" +
+                turnCounter + ";" +
+                radiusAttack + ";" +
+                preferX + ";" +
+                position.x() + "," + position.y() + ";" +
+                targetCastle.x() + "," + targetCastle.y() + ";" +
+                serializeUnits();
     }
 
-    public static ComputerHero deserialize(String data) {
-        ComputerHero hero = new ComputerHero();
-        // Предположим, что в data у нас просто имя героя (можно добавить другие данные)
-        hero.name = data;
+    @Override
+    public String getClassName() {
+        return "ComputerHero";
+    }
 
-        // Здесь можно добавить больше логики для восстановления всех остальных данных объекта,
-        // например, позицию, здоровье, золотые монеты и т.д.
 
+    public static ComputerHero deserialize(String data, Field field, Castle myCastle) {
+        String[] parts = data.split(";");
+        String name = parts[0];
+        int health = Integer.parseInt(parts[1]);
+        int gold = Integer.parseInt(parts[2]);
+        boolean stableBought = Boolean.parseBoolean(parts[3]);
+        boolean firstUnitBought = Boolean.parseBoolean(parts[4]);
+        int turnCounter = Integer.parseInt(parts[5]);
+        int radiusAttack = Integer.parseInt(parts[6]);
+        boolean preferX = Boolean.parseBoolean(parts[7]);
+
+        String[] pos = parts[8].split(",");
+        String[] targetPos = parts[9].split(",");
+        String unitData = parts.length > 8 ? parts[8] : "";
+
+        Position position = new Position(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]));
+        Position target = new Position(Integer.parseInt(targetPos[0]), Integer.parseInt(targetPos[1]));
+
+        ComputerHero hero = new ComputerHero(position, target, 10, myCastle, gold);
+        hero.name = name;
+        hero.health = health;
+        hero.stableBought = stableBought;
+        hero.firstUnitBought = firstUnitBought;
+        hero.turnCounter = turnCounter;
+        hero.radiusAttack = radiusAttack;
+        hero.preferX = preferX;
+
+        hero.deserializeUnits(unitData);
+        field.getCell(position.x(), position.y()).addObject(hero);
         return hero;
     }
+
 
     private boolean shouldBuyHero() {
         // Проверяем, есть ли таверна

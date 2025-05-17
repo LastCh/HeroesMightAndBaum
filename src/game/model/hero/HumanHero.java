@@ -89,7 +89,7 @@ public class HumanHero extends Hero {
         int finalCost = movementPoints - cost;
         spendMovementPoints(finalCost);
         if(dx != 0 || dy != 0) {
-            System.out.println("Вы переместились на: " + newPos);
+            System.out.println("Вы переместились на клетку: (" + newPos.x() + ";" + newPos.y() + ")");
         }
         diag = newDiag;
         field.moveObject(this, this.position.x(), this.position.y(), newPos.x(), newPos.y());
@@ -106,7 +106,7 @@ public class HumanHero extends Hero {
                 .findFirst().orElse(null);
 
         if (cave != null && !cave.isInCave()) {
-            System.out.println("Вы нашли Золотую пещеру и заходите внутрь!");
+            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n");
             cave.interact(this); // Взаимодействие с пещерой
             field.removeCave(cave);
         }
@@ -134,6 +134,7 @@ public class HumanHero extends Hero {
                 if (castle.contains(GameBuildings.STABLE) && !speedStableBonus) {
                     System.out.println("В вашем замке есть конюшня, ваши характеристики передвижения улучшены!");
                     speedStableBonus = true;
+                    maxMovementPoints++;
                 }
                 return false;
             }
@@ -152,12 +153,13 @@ public class HumanHero extends Hero {
                 ((movementPoints > 1) && (oldDiag == 0)));
     }
 
-    public void receiveArtifact() {
-        if(magicalArtifact == null) {
-            this.magicalArtifact = new MagicalArtifact(1,this);
-        }else{
-            magicalArtifact.addArtifact(1);
+    public void receiveArtifact(int count) {
+        if (magicalArtifact == null) {
+            this.magicalArtifact = new MagicalArtifact(count, this);
+        } else {
+            magicalArtifact.addArtifact(count);
         }
+        System.out.println("Вы получили " + count + " артефакта(ов)!");
     }
 
     public boolean useArtifact(Hero target) {
@@ -221,21 +223,47 @@ public class HumanHero extends Hero {
         }
     }
 
+    @Override
     public String serialize() {
-        return name + "," + health + "," + gold;
+        return name + ";" +
+                health + ";" +
+                gold + ";" +
+                speedStableBonus + ";" +
+                (magicalArtifact != null ? magicalArtifact.getAmount() : 0) + ";" +
+                position.x() + "," + position.y() + ";" +
+                serializeUnits();
     }
 
-    public static HumanHero deserialize(String data) {
-        String[] parts = data.split(",");
-        String heroName = parts[0];
-        int heroHealth = Integer.parseInt(parts[1]);
-        int heroGold = Integer.parseInt(parts[2]);
+    @Override
+    public String getClassName() {
+        return "HumanHero";
+    }
 
-        // Создаем героя с начальными данными
-        HumanHero hero = new HumanHero(new Position(0, 0), 10, null, heroGold); // Нужны стартовые параметры
-        hero.name = heroName;
-        hero.setHealth(heroHealth);
+
+    public static HumanHero deserialize(String data, Field field, Castle myCastle) {
+        String[] parts = data.split(";");
+        String name = parts[0];
+        int health = Integer.parseInt(parts[1]);
+        int gold = Integer.parseInt(parts[2]);
+        boolean speedBonus = Boolean.parseBoolean(parts[3]);
+        int artifacts = Integer.parseInt(parts[4]);
+        String[] pos = parts[5].split(",");
+        String unitData = parts.length > 6 ? parts[6] : "";
+
+        Position position = new Position(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]));
+        HumanHero hero = new HumanHero(position, 10, myCastle, gold);
+        hero.name = name;
+        hero.health = health;
+        hero.speedStableBonus = speedBonus;
+
+        if (artifacts > 0) {
+            hero.receiveArtifact(artifacts);
+        }
+
+        hero.deserializeUnits(unitData);
+        field.getCell(position.x(), position.y()).addObject(hero);
         return hero;
     }
+
 
 }

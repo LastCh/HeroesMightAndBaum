@@ -1,37 +1,42 @@
 package game.core.engine;
 
 import game.api.Position;
+import game.interf.MenuManager;
 import game.map.Field;
+import game.model.building.onmap.Castle;
 import game.model.building.onmap.GoldCave;
 import game.model.hero.HumanHero;
 import game.model.hero.ComputerHero;
-import game.model.building.onmap.Castle;
 
 import java.util.Scanner;
 
 public class GameManager {
-    private final Field field;
-    private HumanHero human;        
-    private ComputerHero computer;   
+    private Field field;
+    private HumanHero human;
+    private ComputerHero computer;
     private final Scanner scanner = new Scanner(System.in);
-    private final Castle botCastle;
-    private final Castle playerCastle;
+    private Castle botCastle;
+    private Castle playerCastle;
+    private final MenuManager menu = new MenuManager();
+    private GameSave gameSave;
+    private String playerName;
+    private String gameName = "name";
 
-    public GameManager() {
+    public GameManager(String playerN){
+        playerName = playerN;
+    }
+
+    public void startGame() {
         Generation generation = new Generation();
-        this.field = generation.generateField(10, 10);
+        field = generation.generateField(10, 10);
 
-        botCastle = new Castle(new Position(8, 8), scanner, "\u001B[31;47m", 2000, field);
-        playerCastle = new Castle(new Position(1, 1), scanner, "\u001B[34;47m", 2000, field);
-
+        botCastle = new Castle(new Position(8, 8), "\u001B[31;47m", 2000, field);
+        playerCastle = new Castle(new Position(1, 1),  "\u001B[34;47m", 2000, field);
         field.getCell(8, 8).addObject(botCastle);
         field.getCell(1, 1).addObject(playerCastle);
 
-        this.human = new HumanHero(new Position(0, 0), 10, playerCastle, 1000);
-        this.computer = new ComputerHero(new Position(9, 9), playerCastle.getPosition(), 2, botCastle, 500);
-        human.setHealth(1000);
-        computer.setHealth(1000);
-
+        human = new HumanHero(new Position(0, 0), 10, playerCastle, 1000);
+        computer = new ComputerHero(new Position(9, 9), playerCastle.getPosition(), 2, botCastle, 500);
         field.getCell(0, 0).addObject(human);
         field.getCell(9, 9).addObject(computer);
 
@@ -41,39 +46,44 @@ public class GameManager {
                 x = (int) (Math.random() * field.getWidth());
                 y = (int) (Math.random() * field.getHeight());
             } while (!field.getCell(x, y).isEmpty());
-
             GoldCave cave = new GoldCave(new Position(x, y), 500 + i * 100);
             field.getCell(x, y).addObject(cave);
         }
+
+        gameSave = new GameSave(computer, human, playerCastle, botCastle, field, gameName, playerName);
+
+        Render render = new Render(field, human, scanner, computer, playerCastle, botCastle);
+        clearConsole();
+        render.startGameLoop(this);
     }
 
-    public void startGame() {
-        Render render = new Render(field, human, scanner, computer, botCastle, playerCastle);
-        render.startGameLoop();
+    public void loadGame(GameSave gSave) {
+        field = gSave.field;
+
+        botCastle = gSave.castleComputer;
+        botCastle.setColoredSymbol("\u001B[31;47m"+"♜♜" + "\u001B[0m");
+        playerCastle = gSave.castlePlayer;
+        playerCastle.setColoredSymbol("\u001B[34;47m"+"♜♜" + "\u001B[0m");
+
+        human = gSave.humanHero;
+        computer = gSave.computerHero;
+
+        gameSave = new GameSave(computer, human, playerCastle, botCastle, field, gameName, playerName);
+
+        Render render = new Render(field, human, scanner, computer, playerCastle, botCastle);
+        clearConsole();
+        render.startGameLoop(this);
     }
 
-    public Castle getBotCastle() {
-        return botCastle;
+    public void clearConsole() {
+        for (int i = 0; i < 50; i++) System.out.println();
     }
 
-    public Castle getPlayerCastle() {
-        return playerCastle;
-    }
+    public GameSave getGameSave() { return gameSave; }
 
-    public Field getField() {
-        return field;
-    }
+    public void setPlayerName(String pName) { playerName = pName; }
 
-    public HumanHero getHumanHero() {
-        return human;
-    }
-
-    public ComputerHero getComputerHero() {
-        return computer;
-    }
-
-    public void loadGame(HumanHero hplayer, ComputerHero cplayer) {
-        this.human = hplayer;
-        this.computer = cplayer;
+    public void setGameName(String gName) {
+        this.gameName = gName;
     }
 }

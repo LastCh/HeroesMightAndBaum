@@ -12,10 +12,10 @@ import game.model.hero.PurchasableHero;
 import java.util.*;
 
 public class Field {
-    private final int width;
-    private final int height;
-    private final Cell[][] grid;
-    private final List<PurchasableHero> allHeroes = new ArrayList<>();
+    protected final int width;
+    protected final int height;
+    protected final Cell[][] grid;
+    protected final List<PurchasableHero> allHeroes = new ArrayList<>();
 
     public Field(int width, int height) {
         this.width = width;
@@ -247,12 +247,44 @@ public class Field {
                 candidates.add(new Position(nx, ny));
             }
         }
-        System.out.println("Найдено " + candidates.size() + " свободных клеток для спавна.");
         if (!candidates.isEmpty()) {
             return candidates.get(new Random().nextInt(candidates.size()));
         }
         return null;
 
+    }
+
+    public String serialize() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(width).append(";").append(height).append(";");
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                sb.append(grid[x][y].getTerrainType()).append(",");
+            }
+        }
+        return sb.toString();
+    }
+
+    public static Field deserialize(String data, Castle castlePlayer, Castle castleComputer,
+                                    ComputerHero computerHero, HumanHero humanHero) {
+        String[] parts = data.split(";");
+        int width = Integer.parseInt(parts[0]);
+        int height = Integer.parseInt(parts[1]);
+        String[] cellsData = parts[2].split("@");
+
+        Field field = new Field(width, height);
+
+        int index = 0;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Cell cell = Cell.deserialize(cellsData[index++], field,
+                        castlePlayer, castleComputer, computerHero, humanHero);
+                field.grid[x][y] = cell;
+            }
+        }
+
+        return field;
     }
 
 

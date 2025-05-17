@@ -17,7 +17,7 @@ public class StartMenu extends Inter {
         for (String line : LOGO) {
             System.out.println(PURPLE + line + RESET);
             try {
-                Thread.sleep(100); // Анимация появления
+                Thread.sleep(100);
             } catch (InterruptedException e) {}
         }
         System.out.println("\n" +
@@ -34,10 +34,5 @@ public class StartMenu extends Inter {
                 GRADIENT_2 + "  ║                                            ║\n" +
                 GRADIENT_3 + "  ╚════════════════════════════════════════════╝\n" + RESET);
 
-    }
-
-    public String readStringInput() {
-        System.out.print("Введите строку: ");
-        return scanner.next();
     }
 }

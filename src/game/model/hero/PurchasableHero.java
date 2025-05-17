@@ -104,6 +104,13 @@ public abstract class PurchasableHero extends Hero {
     }
 
     @Override
+    public abstract String serialize();
+
+    @Override
+    public abstract String getClassName();
+
+
+    @Override
     public Hero getOwner() { return owner; }
 
     public abstract String getColor();
