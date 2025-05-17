@@ -11,6 +11,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static game.api.LogConfig.LOGGER;
+
 public class GameSave {
     public ComputerHero computerHero;
     public HumanHero humanHero;
@@ -40,16 +42,15 @@ public class GameSave {
             File file = new File(dir, slotName + ".txt");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 
-                // 👉 1. Сохраняем имя сохранения и имя владельца
                 writer.write(slotName + ";" + saveData.ownerName);
                 writer.newLine();
+                LOGGER.info("Сохранены название сохранения и имя владельца");
 
-                // 👉 2. Сохраняем размеры поля
                 Field field = saveData.field;
                 writer.write(field.getWidth() + ";" + field.getHeight());
                 writer.newLine();
+                LOGGER.info("Сохранены размеры поля");
 
-                // 👉 3. Сохраняем каждую ячейку поля
                 for (int x = 0; x < field.getWidth(); x++) {
                     for (int y = 0; y < field.getHeight(); y++) {
                         Cell cell = field.getCell(x, y);
@@ -57,22 +58,27 @@ public class GameSave {
                         writer.newLine();
                     }
                 }
+                LOGGER.info("Сохранены все ячейки поля");
 
-                // 👉 4. Сохраняем замки
                 writer.write(saveData.castlePlayer.serialize());
                 writer.newLine();
                 writer.write(saveData.castleComputer.serialize());
                 writer.newLine();
+                LOGGER.info("Замки сохранены");
 
-                // 👉 5. Сохраняем героев
+                updatePlayerKarma(saveData.ownerName, saveData.humanHero.getKarma());
+                saveData.humanHero.resetKarma();
+
                 writer.write(saveData.humanHero.serialize());
                 writer.newLine();
                 writer.write(saveData.computerHero.serialize());
                 writer.newLine();
+                LOGGER.info("Герои сохранены");
 
                 System.out.println("✅ Игра сохранена в слот " + slotName);
             }
         } catch (IOException e) {
+            LOGGER.severe("Ошибка при сохранении: " + e.getMessage());
             System.out.println("❌ Ошибка при сохранении: " + e.getMessage());
         }
     }
@@ -83,43 +89,41 @@ public class GameSave {
             File file = new File("saves", slotName + ".txt");
             BufferedReader reader = new BufferedReader(new FileReader(file));
 
-            // 1. Имя и владелец
             String[] meta = reader.readLine().split(";");
             String saveName = meta[0];
             String ownerName = meta[1];
+            LOGGER.info("Загружено название сохранения и владелец");
 
-            // 2. Размеры поля
             String[] dims = reader.readLine().split(";");
             int width = Integer.parseInt(dims[0]);
             int height = Integer.parseInt(dims[1]);
+            LOGGER.info("Загружен размер поля");
 
-            // 3. Считываем все ячейки поля (width * height строк)
             List<String> cellLines = new ArrayList<>();
             for (int i = 0; i < width * height; i++) {
                 cellLines.add(reader.readLine());
             }
+            LOGGER.info("Загружен все ячейки игрового поля");
 
-            // 4. Чтение замков
             String castlePlayerData = reader.readLine();
             String castleComputerData = reader.readLine();
+            LOGGER.info("Загружены замки");
 
-            // 5. Чтение героев
             String humanData = reader.readLine();
             String computerData = reader.readLine();
+            LOGGER.info("Загружены герои");
 
-            // 6. Временное создание пустого поля
             field = new Field(width, height);
+            LOGGER.info("Создано поле");
 
-            // 7. Временное создание замков (с полем)
             castlePlayer = Castle.deserialize(castlePlayerData, field);
             castleComputer = Castle.deserialize(castleComputerData, field);
+            LOGGER.info("Созданы замки");
 
-
-            // 8. Временное создание героев (с полем + замками)
             humanHero = HumanHero.deserialize(humanData, field, castlePlayer);
             computerHero = ComputerHero.deserialize(computerData, field, castleComputer);
+            LOGGER.info("Созданы герои");
 
-            // 9. Заполняем клетки
             int index = 0;
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
@@ -138,17 +142,85 @@ public class GameSave {
                     field.getCell(x, y).setTerrainType(cell.getTerrainType());
                 }
             }
+            LOGGER.info("Все клетки поля заполнены");
 
             reader.close();
             System.out.println("✅ Игра загружена из слота " + slotName);
 
+            int karma = loadPlayerKarma(ownerName);
+            computerHero.addBenefit(karma);
             return new GameSave(computerHero, humanHero, castlePlayer, castleComputer, field, saveName, ownerName);
         } catch (IOException e) {
+            LOGGER.severe("Ошибка при загрузке: " + e.getMessage());
             System.out.println("❌ Ошибка при загрузке: " + e.getMessage());
             return null;
         }
     }
 
+    private int loadPlayerKarma(String playerName) {
+        File file = new File("players.txt");
+        if (!file.exists()) {
+            LOGGER.warning("Файл players.txt не найден.");
+            return 0;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(";");
+                if (parts.length >= 2 && parts[0].equalsIgnoreCase(playerName)) {
+                    return Integer.parseInt(parts[1]);
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            LOGGER.warning("Не удалось прочитать карму игрока: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
+    private static void updatePlayerKarma(String name, double karma) {
+        File file = new File("players.txt");
+        List<String[]> entries = new ArrayList<>();
+        boolean updated = false;
+
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(";");
+                    if (parts[0].equalsIgnoreCase(name)) {
+                        // Обновляем карму, победы оставляем
+                        double oldKarma = Double.parseDouble(parts[1]);
+                        int wins = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
+                        double newKarma = oldKarma + karma;
+                        entries.add(new String[]{name, String.format("%.2f", newKarma), String.valueOf(wins)});
+                        updated = true;
+                    } else {
+                        entries.add(parts); // другие строки не трогаем
+                    }
+                }
+            } catch (IOException | NumberFormatException e) {
+                LOGGER.warning("Ошибка при чтении players.txt: " + e.getMessage());
+            }
+        }
+
+        // Если игрок новый
+        if (!updated) {
+            entries.add(new String[]{name, String.format("%.2f", karma), "0"});
+        }
+
+        // Перезаписываем файл
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (String[] entry : entries) {
+                writer.write(String.join(";", entry));
+                writer.newLine();
+            }
+            LOGGER.info("Обновлена карма игрока в players.txt: " + name + " → +" + karma);
+        } catch (IOException e) {
+            LOGGER.severe("Ошибка записи в players.txt: " + e.getMessage());
+        }
+    }
 
 
 }

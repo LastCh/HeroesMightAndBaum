@@ -10,9 +10,12 @@ import game.model.hero.Hero;
 import game.model.hero.HumanHero;
 import game.model.hero.PurchasableHero;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static game.api.LogConfig.LOGGER;
 import static game.interf.Inter.RED;
 import static game.interf.Inter.RESET;
 import static game.interf.Inter.CYAN;
@@ -40,6 +43,7 @@ public class Render {
     public void startGameLoop(GameManager gmanager) {
         System.out.println("Для начала игры купите первое здание в свой замок и наймите юнитов, чтобы герой смог ходить!");
         while (true) {
+            LOGGER.info("Игровой цикл запущен");
             renderField();
 
             // Показываем управление
@@ -98,16 +102,18 @@ public class Render {
 
                 default -> {
                     clearConsole();
+                    LOGGER.warning("Неверный ввод команды: " + input);
                     System.out.println(RED + "❌ Неверный выбор. Попробуйте снова." + RESET);
                 }
             }
 
-            if (checkCastleCaptured()) {
+            if (checkCastleCaptured(gmanager)) {
                 break;
             }
 
             if (!player.isAlive()) {
                 System.out.println("Ваш герой погиб!");
+                player.addKarma(-0.1);
                 player.resetMovementPoints();
                 player.setGold(200);
                 player.move(0,0,field, 0);
@@ -140,6 +146,7 @@ public class Render {
     private void useArtifact() {
         clearConsole();
         if (!player.hasArtifact()) {
+            LOGGER.warning("Попытка использования артефакта без наличия");
             System.out.println("У вас нет артефакта!");
             return;
         }
@@ -161,6 +168,7 @@ public class Render {
             }
         } catch (Exception e) {
             System.out.println("Ошибка ввода.");
+            LOGGER.severe("Ошибка при использовании артефакта: " + e.getMessage());
             scanner.nextLine();
         }
     }
@@ -168,7 +176,6 @@ public class Render {
     private void moveAllHeroes() {
         List<PurchasableHero> heroes = field.getAllHeroes();
 
-        // Делаем ход для каждого героя
         for (PurchasableHero hero : heroes) {
             if (hero.isAlive()) {
                 hero.makeMove(field);
@@ -191,11 +198,65 @@ public class Render {
         );
     }
 
-    private boolean checkCastleCaptured() {
+    private static void addVictory(String playerName) {
+        File file = new File("players.txt");
+        List<String[]> entries = new ArrayList<>();
+        boolean updated = false;
+
+        // Считываем и обновляем победы
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(";");
+                    if (parts[0].equalsIgnoreCase(playerName)) {
+                        double karma = Double.parseDouble(parts[1]);
+                        int wins = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
+                        wins++;
+                        entries.add(new String[]{playerName, String.valueOf(karma), String.valueOf(wins)});
+                        updated = true;
+                    } else {
+                        entries.add(parts);
+                    }
+                }
+            } catch (IOException | NumberFormatException e) {
+                LOGGER.warning("Ошибка при чтении players.txt: " + e.getMessage());
+            }
+        }
+
+        // Если игрок не найден, добавляем новую строку
+        if (!updated) {
+            entries.add(new String[]{playerName, "0.0", "1"});
+        }
+
+        // Сортировка по победам (в убывающем порядке)
+        entries.sort((a, b) -> {
+            int winsA = a.length > 2 ? Integer.parseInt(a[2]) : 0;
+            int winsB = b.length > 2 ? Integer.parseInt(b[2]) : 0;
+            return Integer.compare(winsB, winsA);
+        });
+
+        // Записываем обратно
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (String[] entry : entries) {
+                String line = String.join(";", entry);
+                writer.write(line);
+                writer.newLine();
+            }
+            LOGGER.info("Обновлена статистика побед для игрока: " + playerName);
+        } catch (IOException e) {
+            LOGGER.severe("Ошибка записи players.txt: " + e.getMessage());
+        }
+    }
+
+
+    private boolean checkCastleCaptured(GameManager gmanager) {
         if (castleBot.isDestroyed()) {
             clearConsole();
             System.out.println("Игрок захватил вражеский замок!");
+            LOGGER.info("Игрок победил: вражеский замок уничтожен");
             System.out.println("\n\n\n\n\n\n"+CYAN + "КОНЕЦ!" + RESET);
+            addVictory(gmanager.getPlayerName());
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
@@ -206,6 +267,7 @@ public class Render {
         if (castlePlayer.isDestroyed()) {
             clearConsole();
             System.out.println("\n\n\n\n\n\n"+CYAN + "КОНЕЦ!" + RESET);
+            LOGGER.info("Компьютер победил: замок игрока уничтожен");
             System.out.println("Компьютер захватил ваш замок!");
             try {
                 Thread.sleep(5000);

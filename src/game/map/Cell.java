@@ -104,8 +104,8 @@ public class Cell {
                 }
 
                 case "GoldCave" -> GoldCave.deserialize(objData);
-                case "HumanHero" -> humanHero;
-                case "ComputerHero" -> computerHero;
+                case "HumanHero" -> null;
+                case "ComputerHero" -> null;
                 case "ElfHero" -> ElfHero.deserialize(objData, field, castleComputer, computerHero);
                 case "OrcHero" -> OrcHero.deserialize(objData, field, castleComputer, computerHero);
                 case "DwarfHero" -> DwarfHero.deserialize(objData, field, castleComputer, computerHero);

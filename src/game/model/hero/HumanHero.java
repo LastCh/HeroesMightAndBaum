@@ -18,6 +18,7 @@ public class HumanHero extends Hero {
     boolean speedStableBonus = false;
     private MagicalArtifact magicalArtifact;
     private String name;
+    private double karma = 0;
 
     public HumanHero(Position startPosition, int points, Castle castle, int gold) {
         super(startPosition, COLOR, castle, 10, points, gold);
@@ -79,7 +80,6 @@ public class HumanHero extends Hero {
         cost--;
         cost -= (int)newAccumulatedMovementCoef;
 
-        // Проверка стоимости
         if(cost < 0){
             System.out.println("Недостаточно очков для перемещения!");
             return;
@@ -116,6 +116,9 @@ public class HumanHero extends Hero {
         ComputerHero target = field.getComputerHeroAt(newPos);
         if (target != null) {
             this.attack(target);
+            if(!target.isAlive()){
+                karma+=0.1;
+            }
             spendMovementPoints(1);
             return true;
         } else {
@@ -173,6 +176,7 @@ public class HumanHero extends Hero {
         }
         target.takeDamage(target.getHealth());
         System.out.println("💥 Артефакт активирован! Враг уничтожен.");
+        karma += 0.1;
         return true;
     }
 
@@ -189,7 +193,6 @@ public class HumanHero extends Hero {
         Position newPos = new Position(newX, newY);
         List<FieldObject> objectsAtNewPos = caveField.getCell(newX, newY).getObjects();
 
-        // Проверяем, есть ли живой зомби в клетке
         Zombie zombie = null;
         for (FieldObject obj : objectsAtNewPos) {
             if (obj instanceof Zombie z && !z.isDead()) {
@@ -207,7 +210,6 @@ public class HumanHero extends Hero {
             }
         }
 
-        // Перемещаем героя
         caveField.getCell(current.x(), current.y()).removeObject(this);
         this.setPosition(newPos);
         caveField.getCell(newX, newY).addObject(this);
@@ -239,7 +241,6 @@ public class HumanHero extends Hero {
         return "HumanHero";
     }
 
-
     public static HumanHero deserialize(String data, Field field, Castle myCastle) {
         String[] parts = data.split(";");
         String name = parts[0];
@@ -265,5 +266,9 @@ public class HumanHero extends Hero {
         return hero;
     }
 
+    public double getKarma() { return karma;}
 
+    public void resetKarma() { karma = 0; }
+
+    public void addKarma(double karm) { karma += karm; }
 }

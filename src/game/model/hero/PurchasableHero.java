@@ -41,6 +41,8 @@ public abstract class PurchasableHero extends Hero {
 
         // Атака замка, если на его позиции
         Hero targetHero = field.getNearestEnemyHero(this);
+        if (targetHero == null) return;
+
         Castle enemyCastle = field.getCastleAt(targetHero.getMyCastle().getPosition());
         if (enemyCastle != null) {
             Position castlePos = enemyCastle.getPosition();
@@ -57,7 +59,7 @@ public abstract class PurchasableHero extends Hero {
 
     }
 
-    private void moveTowardsCastle(Field field, Position targetCastle) {
+    protected void moveTowardsCastle(Field field, Position targetCastle) {
         if (getPosition().equals(targetCastle)) {
             return;
         }
@@ -85,7 +87,7 @@ public abstract class PurchasableHero extends Hero {
         }
     }
 
-    private boolean tryMove(int dx, int dy, Field field) {
+    protected boolean tryMove(int dx, int dy, Field field) {
         int d = (dx != 0 && dy != 0) ? 1 : 0;
 
         Position before = getPosition();

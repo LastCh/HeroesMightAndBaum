@@ -55,6 +55,7 @@ public abstract class Hero extends FieldObject {
 
     public void takeDamage(int damage) {
         health -= damage;
+        if (health < 0) health = 0;
         if (health <= 0) {
             System.out.println(this.getClass().getSimpleName() + " погиб!");
         }

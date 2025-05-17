@@ -22,7 +22,7 @@ public class ComputerHero extends Hero {
     private static final int MIN_GOLD_FOR_HERO = 200;
     private int turnCounter = 0;
     private int radiusAttack = 1;
-
+    private double karma = 0;
 
     public ComputerHero() {
         super(new Position(0, 0), COLOR, null, 10, 0, 0); // Можно использовать дефолтные значения или передать их позже
@@ -32,8 +32,9 @@ public class ComputerHero extends Hero {
     public ComputerHero(Position startPosition, Position targetCastle, int points, Castle castle, int gold) {
         super(startPosition, COLOR, castle, 10, points, gold);
         this.targetCastle = targetCastle;
-        this.power = 0;
+        this.power = (int)(10 * karma);
         this.movementPoints = points;
+        this.addGold((int)(100 * karma));
     }
 
 
@@ -279,7 +280,7 @@ public class ComputerHero extends Hero {
 
         String[] pos = parts[8].split(",");
         String[] targetPos = parts[9].split(",");
-        String unitData = parts.length > 8 ? parts[8] : "";
+        String unitData = parts.length > 10 ? parts[10] : "";
 
         Position position = new Position(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]));
         Position target = new Position(Integer.parseInt(targetPos[0]), Integer.parseInt(targetPos[1]));
@@ -372,6 +373,15 @@ public class ComputerHero extends Hero {
         } else {
             setRadius(1);
         }
+    }
+
+    public void addBenefit(int karm) {
+        if(karm < 0){
+            karma = 0;
+        }else {
+            karma = karm;
+        }
+
     }
 
     public int getRadius() { return radiusAttack; }

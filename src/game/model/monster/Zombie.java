@@ -29,11 +29,22 @@ public class Zombie extends Hero {
 
     @Override
     public String serialize() {
-        return "";
+        return position.x() + "," + position.y() + ";" + getHealth();
     }
+
+    public static Zombie deserialize(String data) {
+        String[] parts = data.split(";");
+        String[] coords = parts[0].split(",");
+        int x = Integer.parseInt(coords[0]);
+        int y = Integer.parseInt(coords[1]);
+        int health = Integer.parseInt(parts[1]);
+
+        return new Zombie(new Position(x, y), health);
+    }
+
 
     @Override
     public String getClassName() {
-        return "";
+        return "Zombie";
     }
 }

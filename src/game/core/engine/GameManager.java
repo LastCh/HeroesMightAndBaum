@@ -10,6 +10,8 @@ import game.model.hero.ComputerHero;
 
 import java.util.Scanner;
 
+import static game.api.LogConfig.LOGGER;
+
 public class GameManager {
     private Field field;
     private HumanHero human;
@@ -21,19 +23,31 @@ public class GameManager {
     private GameSave gameSave;
     private String playerName;
     private String gameName = "name";
+    private int karma;
 
     public GameManager(String playerN){
         playerName = playerN;
     }
 
     public void startGame() {
+        LOGGER.info("Начало генерации карты");
         Generation generation = new Generation();
         field = generation.generateField(10, 10);
+        LOGGER.info("Карта сгенерирована");
 
-        botCastle = new Castle(new Position(8, 8), "\u001B[31;47m", 2000, field);
-        playerCastle = new Castle(new Position(1, 1),  "\u001B[34;47m", 2000, field);
+        try {
+            botCastle = new Castle(new Position(8, 8), "\u001B[31;47m", 2000, field);
+            playerCastle = new Castle(new Position(1, 1),  "\u001B[34;47m", 2000, field);
+        } catch (Exception e) {
+            LOGGER.severe("Ошибка при создании замков: " + e.getMessage());
+        }
+
         field.getCell(8, 8).addObject(botCastle);
         field.getCell(1, 1).addObject(playerCastle);
+
+        if (botCastle == null || playerCastle == null) {
+            LOGGER.warning("Один из замков не инициализирован!");
+        }
 
         human = new HumanHero(new Position(0, 0), 10, playerCastle, 1000);
         computer = new ComputerHero(new Position(9, 9), playerCastle.getPosition(), 2, botCastle, 500);
@@ -52,6 +66,7 @@ public class GameManager {
 
         gameSave = new GameSave(computer, human, playerCastle, botCastle, field, gameName, playerName);
 
+        LOGGER.info("Запуск игрового цикла");
         Render render = new Render(field, human, scanner, computer, playerCastle, botCastle);
         clearConsole();
         render.startGameLoop(this);
@@ -83,7 +98,7 @@ public class GameManager {
 
     public void setPlayerName(String pName) { playerName = pName; }
 
-    public void setGameName(String gName) {
-        this.gameName = gName;
-    }
+    public String getPlayerName() { return playerName; }
+
+    public void setGameName(String gName) { this.gameName = gName; }
 }

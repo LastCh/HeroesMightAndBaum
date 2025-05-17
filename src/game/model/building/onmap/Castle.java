@@ -44,9 +44,16 @@ public class Castle extends FieldObject implements Immovable {
         int x = Integer.parseInt(coords[0]);
         int y = Integer.parseInt(coords[1]);
         int health = Integer.parseInt(parts[1]);
-        String colStr  = parts[2];
+        StringBuilder sb = new StringBuilder();
+        for (int i = 2; i < parts.length; i++) {
+            if (i > 2) sb.append(";");
+            sb.append(parts[i]);
+        }
+        String colStr = sb.toString();
 
-        return new Castle(new Position(x, y), colStr, health, field);
+        Castle c = new Castle(new Position(x, y), health, field);
+        c.setColoredSymbol(colStr);
+        return c;
     }
 
     @Override
