@@ -1,7 +1,6 @@
 package game.map;
 
 import game.api.Position;
-import game.model.hero.Hero;
 import game.model.monster.Zombie;
 
 import java.util.ArrayList;

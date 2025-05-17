@@ -21,6 +21,7 @@ public class ComputerHero extends Hero {
     private static final double HERO_PURCHASE_CHANCE = 1.0 / 6;
     private static final int MIN_GOLD_FOR_HERO = 200;
     private int turnCounter = 0;
+    private int radiusAttack = 1;
 
 
     public ComputerHero() {
@@ -59,9 +60,6 @@ public class ComputerHero extends Hero {
             autoBuy(field);
         }
 
-        // Проверка на вражеского героя в радиусе 2 клеток
-        if (attackNearbyPlayerIfExists(field)) return;
-
         // Атака замка
         Castle enemyCastle = field.getCastleAt(targetCastle);
         if (enemyCastle != null) {
@@ -76,6 +74,11 @@ public class ComputerHero extends Hero {
             }
         }
 
+        if (radiusAttack != 2){ enhanceRadius(units); }
+
+        // Проверка на вражеского героя в радиусе n клеток
+        if (attackNearbyPlayerIfExists(field, radiusAttack)) return;
+
         moveTowardsCastle(field); // Передвижение к замку
 
     }
@@ -88,9 +91,9 @@ public class ComputerHero extends Hero {
         log("Герой компьютера возрожден на позиции (9,9)");
     }
 
-    private boolean attackNearbyPlayerIfExists(Field field) {
-        for (int dx = -2; dx <= 2; dx++) {
-            for (int dy = -2; dy <= 2; dy++) {
+    private boolean attackNearbyPlayerIfExists(Field field, int radius) {
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dy = -radius; dy <= radius; dy++) {
                 Position newPos = new Position(position.x() + dx, position.y() + dy);
                 HumanHero player = field.getHumanHeroAt(newPos);
                 if (player != null && movementPoints > 0) {
@@ -317,4 +320,23 @@ public class ComputerHero extends Hero {
         System.out.println("[AI] " + msg);
     }
 
+    public void enhanceRadius(ArrayList<Unit> nowUnits) {
+        int rangedCount = 0;
+
+        for (Unit u : nowUnits) {
+            if (u.getClass().getSimpleName().equals("Crossbowman")) {
+                rangedCount++;
+            }
+        }
+
+        if (rangedCount >= 3) {
+            setRadius(2);
+        } else {
+            setRadius(1);
+        }
+    }
+
+    public int getRadius() { return radiusAttack; }
+
+    public void setRadius(int radius) { this.radiusAttack = radius; }
 }

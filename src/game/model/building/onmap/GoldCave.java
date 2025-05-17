@@ -33,11 +33,6 @@ public class GoldCave extends FieldObject implements Immovable {
     }
 
     public void interact(HumanHero player) {
-        if (completed) {
-            System.out.println("Пещера уже очищена.");
-            return;
-        }
-
         System.out.println("Игрок входит в Золотую пещеру!");
         player.setPosition(caveEntry);
         dungeonField.getCell(caveEntry.x(), caveEntry.y()).addObject(player);
