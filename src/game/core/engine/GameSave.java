@@ -144,6 +144,9 @@ public class GameSave {
             }
             LOGGER.info("Все клетки поля заполнены");
 
+            field.getCell(castlePlayer.getPosition().x(), castlePlayer.getPosition().y()).addObject(castlePlayer);
+            field.getCell(castleComputer.getPosition().x(), castleComputer.getPosition().y()).addObject(castleComputer);
+
             reader.close();
             System.out.println("✅ Игра загружена из слота " + slotName);
 

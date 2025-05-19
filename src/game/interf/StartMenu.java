@@ -31,10 +31,13 @@ public class StartMenu extends Inter {
                 " ".repeat(23) + GRADIENT_3 + "║\n" +
                 GRADIENT_1 + "  ║    " + YELLOW + "3. " + CYAN + "Показать таблицу лидеров" +
                 " ".repeat(8) + GRADIENT_1 + "     ║\n" +
-                GRADIENT_1 + "  ║    " + YELLOW + "4. " + PURPLE + "Выйти" +
+                GRADIENT_1 + "  ║    " + YELLOW + "4. " + CYAN + "Редактор карты" +
+                " ".repeat(23) + GRADIENT_1 + "║\n" +
+                GRADIENT_1 + "  ║    " + YELLOW + "5. " + PURPLE + "Выйти" +
                 " ".repeat(32) + GRADIENT_1 + "║\n" +
                 GRADIENT_2 + "  ║                                            ║\n" +
                 GRADIENT_3 + "  ╚════════════════════════════════════════════╝\n" + RESET);
 
     }
 }
+

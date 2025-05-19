@@ -1,7 +1,6 @@
 package game.map;
 
 import game.api.FieldObject;
-import game.api.Position;
 import game.model.building.onmap.Castle;
 import game.model.building.onmap.GoldCave;
 import game.model.hero.*;
@@ -76,10 +75,8 @@ public class Cell {
         Cell cell = new Cell();
         String[] parts = data.split("\\|");
 
-        // 1. Terrain
         cell.setTerrainType(TerrainType.valueOf(parts[0]));
 
-        // 2. FieldObjects
         for (int i = 1; i < parts.length; i++) {
             String[] objParts = parts[i].split("#", 2);
             String type = objParts[0];
@@ -87,21 +84,23 @@ public class Cell {
 
             FieldObject obj = switch (type) {
                 case "Castle" -> {
-                    // Сначала вытаскиваем позицию из сериализованной строки
-                    String[] split = objData.split(";");
-                    String[] coord = split[0].split(",");
-                    Position pos = new Position(Integer.parseInt(coord[0]), Integer.parseInt(coord[1]));
-
-                    // Сравниваем с позициями уже загруженных замков
-                    if (pos.equals(castlePlayer.getPosition())) {
+                    Castle temp = Castle.deserialize(objData, field);
+                    if (castlePlayer != null && temp.getPosition().equals(castlePlayer.getPosition())) {
+                        // Копируем здания из temp в castlePlayer
+                        for (var building : temp.getBuildings()) {
+                            castlePlayer.addBuilding(building);
+                        }
                         yield castlePlayer;
-                    } else if (pos.equals(castleComputer.getPosition())) {
+                    } else if (castleComputer != null && temp.getPosition().equals(castleComputer.getPosition())) {
+                        for (var building : temp.getBuildings()) {
+                            castleComputer.addBuilding(building);
+                        }
                         yield castleComputer;
                     } else {
-                        // На случай, если когда-нибудь будет третий замок (напр., нейтральный)
-                        yield Castle.deserialize(objData, field);
+                        yield temp;
                     }
                 }
+
 
                 case "GoldCave" -> GoldCave.deserialize(objData);
                 case "HumanHero" -> null;
@@ -119,7 +118,4 @@ public class Cell {
 
         return cell;
     }
-
-
-
 }

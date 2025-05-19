@@ -35,26 +35,49 @@ public class Castle extends FieldObject implements Immovable {
 
     @Override
     public String serialize() {
-        return position.x() + "," + position.y() + ";" + health + ";" + coloredSymbol;
+        StringBuilder sb = new StringBuilder();
+        sb.append(position.x()).append(",").append(position.y()).append(";")
+                .append(health).append(";")
+                .append(coloredSymbol).append(";");
+
+        for (int i = 0; i < buildings.size(); i++) {
+            sb.append(buildings.get(i).getClass().getSimpleName());
+            if (i < buildings.size() - 1) sb.append(",");
+        }
+
+        return sb.toString();
     }
 
+
     public static Castle deserialize(String data, Field field) {
-        String[] parts = data.split(";");
+        String[] parts = data.split(";", -1); // <- важно: -1, чтобы не терялись пустые части
+
         String[] coords = parts[0].split(",");
         int x = Integer.parseInt(coords[0]);
         int y = Integer.parseInt(coords[1]);
         int health = Integer.parseInt(parts[1]);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 2; i < parts.length; i++) {
-            if (i > 2) sb.append(";");
-            sb.append(parts[i]);
-        }
-        String colStr = sb.toString();
-
+        String color = parts[2]; // цветовая строка
         Castle c = new Castle(new Position(x, y), health, field);
-        c.setColoredSymbol(colStr);
+        c.setColoredSymbol(color);
+
+        if (parts.length > 3 && !parts[3].isEmpty()) {
+            String[] buildingNames = parts[3].split(",");
+            for (String name : buildingNames) {
+                try {
+                    Class<?> clazz = Class.forName("game.model.building.incastle." + name);
+                    Object instance = clazz.getDeclaredConstructor().newInstance();
+                    if (instance instanceof BuildingCastle building) {
+                        c.addBuilding(building);
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Не удалось загрузить здание: " + name);
+                }
+            }
+        }
+
         return c;
     }
+
 
     @Override
     public String getClassName() {
@@ -72,6 +95,10 @@ public class Castle extends FieldObject implements Immovable {
 
     public boolean isDestroyed() {
         return health <= 0;
+    }
+
+    public ArrayList<BuildingCastle> getBuildings() {
+        return buildings;
     }
 
     public Field getField() {

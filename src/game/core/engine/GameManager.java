@@ -23,6 +23,7 @@ public class GameManager {
     private GameSave gameSave;
     private String playerName;
     private String gameName = "name";
+    private Field customField = null;
     private int karma;
 
     public GameManager(String playerN){
@@ -90,6 +91,53 @@ public class GameManager {
         render.startGameLoop(this);
     }
 
+    public void startGameFromCustomMap() {
+        if (customField == null) {
+            System.out.println("❌ Кастомное поле не задано.");
+            return;
+        }
+
+        this.field = customField;
+
+        // Ищем замки и героев
+        Castle firstCastle = null, secondCastle = null;
+        for (int x = 0; x < field.getWidth(); x++) {
+            for (int y = 0; y < field.getHeight(); y++) {
+                for (var obj : field.getCell(x, y).getObjects()) {
+                    if (obj instanceof Castle castle) {
+                        if (firstCastle == null) {
+                            firstCastle = castle;
+                        } else {
+                            secondCastle = castle;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (firstCastle == null || secondCastle == null) {
+            System.out.println("❌ Не хватает замков на карте.");
+            return;
+        }
+
+        this.playerCastle = firstCastle;
+        this.botCastle = secondCastle;
+
+        this.human = new HumanHero(firstCastle.getPosition(), 10, firstCastle, 1000);
+        this.computer = new ComputerHero(secondCastle.getPosition(), firstCastle.getPosition(), 2, secondCastle, 500);
+
+        field.getCell(firstCastle.getPosition().x(),firstCastle.getPosition().y()).addObject(human);
+        field.getCell(firstCastle.getPosition().x(),firstCastle.getPosition().y()).addObject(computer);
+
+        this.gameSave = new GameSave(computer, human, playerCastle, botCastle, field, gameName, playerName);
+
+        System.out.println("✅ Игра загружена с пользовательской карты.");
+        Render render = new Render(field, human, scanner, computer, playerCastle, botCastle);
+        clearConsole();
+        render.startGameLoop(this);
+    }
+
+
     public void clearConsole() {
         for (int i = 0; i < 50; i++) System.out.println();
     }
@@ -101,4 +149,7 @@ public class GameManager {
     public String getPlayerName() { return playerName; }
 
     public void setGameName(String gName) { this.gameName = gName; }
+
+    public void setCustomField(Field customField) { this.customField = customField; }
+
 }

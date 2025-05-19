@@ -2,6 +2,7 @@ package game.interf;
 
 import game.core.engine.GameManager;
 import game.core.engine.GameSave;
+import game.map.Field;
 import game.model.hero.ComputerHero;
 import game.model.hero.HumanHero;
 
@@ -57,6 +58,10 @@ public class MenuManager {
                     showLeaderboard();
                 }
                 case 4 -> {
+                    Field customField = MapEditor.editMap(10, 10);
+                    gmanager.setCustomField(customField); // нужен метод в GameManager
+                }
+                case 5 -> {
                     LOGGER.info("Пользователь вышел из игры.");
                     System.out.println("Выход из игры...");
                     return;
@@ -82,7 +87,8 @@ public class MenuManager {
                     GRADIENT_1 + "  ║  " + YELLOW + "1. " + CYAN + "Управление замком      " + RESET + GRADIENT_1 + "║\n" +
                     GRADIENT_2 + "  ║  " + YELLOW + "2. " + CYAN + "Вернуться в игру       " + RESET + GRADIENT_2 + "║\n" +
                     GRADIENT_3 + "  ║  " + YELLOW + "3. " + CYAN + "Сохранить игру         " + RESET + GRADIENT_3 + "║\n" +
-                    GRADIENT_1 + "  ║  " + YELLOW + "4. " + CYAN + "Главное меню           " + RESET + GRADIENT_1 + "║\n" +
+                    GRADIENT_2 + "  ║  " + YELLOW + "4. " + CYAN + "Редактор карты         " + RESET + GRADIENT_2 + "║\n" +
+                    GRADIENT_1 + "  ║  " + YELLOW + "5. " + CYAN + "Главное меню           " + RESET + GRADIENT_1 + "║\n" +
                     GRADIENT_2 + "  ╚════════════════════════════╝\n" + RESET);
 
             System.out.print("Ваш выбор: ");
@@ -115,6 +121,11 @@ public class MenuManager {
                     saveGame(gmanager);
                 }
                 case 4 -> {
+                    clearConsole();
+                    MapEditor.editExistingField(gmanager.getGameSave().field); // редактируем текущее поле
+                    System.out.println(GREEN + "✅ Изменения карты сохранены." + RESET);
+                }
+                case 5 -> {
                     clearConsole();
                     return true;
                 }
@@ -270,7 +281,7 @@ public class MenuManager {
             }
         }
 
-        System.out.println(GRADIENT_1 + "  ║ " + CYAN + "Ваши сохранения:" + RESET + GRADIENT_1 + "                ║");
+        System.out.println(GRADIENT_1 + "  ║ " + CYAN + "Ваши сохранения:" + RESET + GRADIENT_1 + "               ║");
         for (String name : playerSaveNames) {
             System.out.println(GRADIENT_2 + "  ║   " + YELLOW + "- " + name + RESET +
                     GRADIENT_2 + " ".repeat(24 - name.length()) + "   ║");
@@ -349,9 +360,78 @@ public class MenuManager {
     }
 
     private void startNewGame() {
-        System.out.println("Начинаем новую игру...");
-        gmanager.startGame();
+        System.out.println(
+                GRADIENT_1 + "  ╔════════════════════════════════════════════╗\n" +
+                        GRADIENT_2 + "  ║" + BOLD + "         🌍 Выбор режима игры          " + RESET + GRADIENT_2 + "     ║\n" +
+                        GRADIENT_3 + "  ╠════════════════════════════════════════════╣\n" +
+                        GRADIENT_1 + "  ║                                            ║\n" +
+                        GRADIENT_2 + "  ║    " + YELLOW + "1. " + CYAN + "Стандартная генерация карты" +
+                        " ".repeat(7) + GRADIENT_2 + "   ║\n" +
+                        GRADIENT_3 + "  ║    " + YELLOW + "2. " + CYAN + "Загрузить свою карту" +
+                        " ".repeat(16) + GRADIENT_3 + " ║\n" +
+                        GRADIENT_1 + "  ║                                            ║\n" +
+                        GRADIENT_2 + "  ╚════════════════════════════════════════════╝" + RESET
+        );
+        System.out.print("Ваш выбор: ");
+
+
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine().trim();
+
+        switch (input) {
+            case "1" -> {
+                System.out.println("Начинаем новую стандартную игру...");
+                gmanager.startGame();
+            }
+            case "2" -> {
+                Field customField = loadCustomMap();
+                if (customField != null) {
+                    gmanager.setCustomField(customField);
+                    gmanager.startGameFromCustomMap();
+                } else {
+                    System.out.println("❌ Не удалось загрузить пользовательскую карту.");
+                }
+            }
+            default -> System.out.println("❌ Неверный выбор.");
+        }
     }
+
+    private Field loadCustomMap() {
+        File dir = new File("custom_maps");
+        if (!dir.exists() || !dir.isDirectory()) {
+            System.out.println("❌ Папка custom_maps не найдена.");
+            return null;
+        }
+
+        File[] files = dir.listFiles((f, name) -> name.endsWith(".map"));
+        if (files == null || files.length == 0) {
+            System.out.println("❌ Нет доступных пользовательских карт.");
+            return null;
+        }
+
+        System.out.println("Выберите карту(название до точки):");
+        for (int i = 0; i < files.length; i++) {
+            System.out.println((i + 1) + ". " + files[i].getName());
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+        try {
+            choice = Integer.parseInt(scanner.nextLine().trim()) - 1;
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Неверный формат.");
+            return null;
+        }
+
+        if (choice < 0 || choice >= files.length) {
+            System.out.println("❌ Неверный номер.");
+            return null;
+        }
+
+        return MapEditor.loadCustomMap(files[choice]);
+    }
+
+
 
     public GameMenu getGameMenu() {
         return gameMenu;
