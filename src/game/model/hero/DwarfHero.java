@@ -34,7 +34,7 @@ public class DwarfHero extends PurchasableHero {
                 serializeUnits();
     }
 
-    public static DwarfHero deserialize(String data, Field field, Castle castle, Hero owner) {
+    public static DwarfHero deserialize(String data, Field field, Castle playerCastle, Castle compCastle , Hero player, Hero Comp) {
         String[] parts = data.split(";");
         String[] pos = parts[0].split(",");
         int x = Integer.parseInt(pos[0]);
@@ -42,12 +42,24 @@ public class DwarfHero extends PurchasableHero {
         int power = Integer.parseInt(parts[1]);
         int points = Integer.parseInt(parts[2]);
         int gold = Integer.parseInt(parts[3]);
-        String unitData = parts.length > 4 ? parts[4] : "";
+        String name = parts[4];
+        String unitData = parts.length > 5 ? parts[5] : "";
 
-        DwarfHero hero = new DwarfHero(new Position(x, y), castle, power, points, gold, owner);
-        hero.deserializeUnits(unitData);
-        field.getCell(x, y).addObject(hero);
-        return hero;
+        DwarfHero hero1 = new DwarfHero(new Position(x, y), playerCastle, power, points, gold, player);
+
+        if(name == "HumanHero"){
+            DwarfHero hero = new DwarfHero(new Position(x, y), playerCastle, power, points, gold, player);
+            field.getCell(x, y).addObject(hero);
+            hero.deserializeUnits(unitData);
+            return hero;
+        }
+        if(name == "ComputerHero"){
+            DwarfHero hero = new DwarfHero(new Position(x, y), compCastle, power, points, gold, Comp);
+            field.getCell(x, y).addObject(hero);
+            hero.deserializeUnits(unitData);
+            return hero;
+        }
+        return hero1;
     }
 
 

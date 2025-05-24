@@ -23,6 +23,16 @@ public class Castle extends FieldObject implements Immovable {
         return buildings.contains(obj);
     }
 
+    public boolean containsName(BuildingCastle obj) {
+        boolean cont = false;
+        for(int i = 0; i < buildings.size(); i++ ){
+            if (obj.getNameNotStat() == buildings.get(i).getNameNotStat()) {
+                cont = true;
+            }
+        }
+        return cont;
+    }
+
     public void addBuilding(BuildingCastle build) {
         buildings.add(build);
     }
@@ -60,8 +70,8 @@ public class Castle extends FieldObject implements Immovable {
         Castle c = new Castle(new Position(x, y), health, field);
         c.setColoredSymbol(color);
 
-        if (parts.length > 3 && !parts[3].isEmpty()) {
-            String[] buildingNames = parts[3].split(",");
+        if (parts.length > 3 && !parts[4].isEmpty()) {
+            String[] buildingNames = parts[4].split(",");
             for (String name : buildingNames) {
                 try {
                     Class<?> clazz = Class.forName("game.model.building.incastle." + name);

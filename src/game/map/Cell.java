@@ -83,31 +83,13 @@ public class Cell {
             String objData = objParts[1];
 
             FieldObject obj = switch (type) {
-                case "Castle" -> {
-                    Castle temp = Castle.deserialize(objData, field);
-                    if (castlePlayer != null && temp.getPosition().equals(castlePlayer.getPosition())) {
-                        // Копируем здания из temp в castlePlayer
-                        for (var building : temp.getBuildings()) {
-                            castlePlayer.addBuilding(building);
-                        }
-                        yield castlePlayer;
-                    } else if (castleComputer != null && temp.getPosition().equals(castleComputer.getPosition())) {
-                        for (var building : temp.getBuildings()) {
-                            castleComputer.addBuilding(building);
-                        }
-                        yield castleComputer;
-                    } else {
-                        yield temp;
-                    }
-                }
-
-
+                case "Castle" -> null;
                 case "GoldCave" -> GoldCave.deserialize(objData);
                 case "HumanHero" -> null;
                 case "ComputerHero" -> null;
-                case "ElfHero" -> ElfHero.deserialize(objData, field, castleComputer, computerHero);
-                case "OrcHero" -> OrcHero.deserialize(objData, field, castleComputer, computerHero);
-                case "DwarfHero" -> DwarfHero.deserialize(objData, field, castleComputer, computerHero);
+                case "ElfHero" -> ElfHero.deserialize(objData, field,castlePlayer, castleComputer, humanHero, computerHero);
+                case "OrcHero" -> OrcHero.deserialize(objData, field,castlePlayer, castleComputer, humanHero, computerHero);
+                case "DwarfHero" -> DwarfHero.deserialize(objData, field,castlePlayer, castleComputer, humanHero, computerHero);
                 default -> null;
             };
 

@@ -40,7 +40,7 @@ public class BuyBuildingMenu extends Inter {
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
                 }
-                if (player.getMyCastle().contains(GameBuildings.TAVERN)) {
+                if (player.getMyCastle().containsName(GameBuildings.TAVERN)) {
                     showGold.run();
                     System.out.println(RED + "🏠 В замке уже есть таверна!" + RESET);
                     break;
@@ -57,7 +57,7 @@ public class BuyBuildingMenu extends Inter {
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
                 }
-                if (player.getMyCastle().contains(GameBuildings.STABLE)) {
+                if (player.getMyCastle().containsName(GameBuildings.STABLE)) {
                     showGold.run();
                     System.out.println(RED + "🏠 В замке уже есть конюшня!" + RESET);
                     break;
@@ -74,7 +74,7 @@ public class BuyBuildingMenu extends Inter {
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
                 }
-                if (player.getMyCastle().contains(GameBuildings.GUARD_POST)) {
+                if (player.getMyCastle().containsName(GameBuildings.GUARD_POST)) {
                     showGold.run();
                     System.out.println(RED + "🏠 В замке уже есть сторожевой пост!" + RESET);
                     break;
@@ -91,7 +91,7 @@ public class BuyBuildingMenu extends Inter {
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
                 }
-                if (player.getMyCastle().contains(GameBuildings.CROSSBOWMENS_TOWER)) {
+                if (player.getMyCastle().containsName(GameBuildings.CROSSBOWMENS_TOWER)) {
                     showGold.run();
                     System.out.println(RED + "🏠 В замке уже есть башня арбалетчиков!" + RESET);
                     break;
@@ -108,7 +108,7 @@ public class BuyBuildingMenu extends Inter {
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
                 }
-                if (player.getMyCastle().contains(GameBuildings.ARMORY)) {
+                if (player.getMyCastle().containsName(GameBuildings.ARMORY)) {
                     showGold.run();
                     System.out.println(RED + "🏠 В замке уже есть оружейная!" + RESET);
                     break;
@@ -125,7 +125,7 @@ public class BuyBuildingMenu extends Inter {
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
                 }
-                if (player.getMyCastle().contains(GameBuildings.ARENA)) {
+                if (player.getMyCastle().containsName(GameBuildings.ARENA)) {
                     showGold.run();
                     System.out.println(RED + "🏠 В замке уже есть арена!" + RESET);
                     break;
@@ -142,7 +142,7 @@ public class BuyBuildingMenu extends Inter {
                     System.out.println(RED + "⚠️ Не хватает золота!" + RESET);
                     break;
                 }
-                if (player.getMyCastle().contains(GameBuildings.CATHEDRAL)) {
+                if (player.getMyCastle().containsName(GameBuildings.CATHEDRAL)) {
                     showGold.run();
                     System.out.println(RED + "🏠 В замке уже есть собор!" + RESET);
                     break;
