@@ -192,22 +192,6 @@ public class Field {
         return null;
     }
 
-    // Новый метод для получения всех золотых пещер
-    public List<GoldCave> getGoldCaves() {
-        List<GoldCave> goldCaves = new ArrayList<>();
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Cell cell = grid[x][y];
-                for (FieldObject obj : cell.getObjects()) {
-                    if (obj instanceof GoldCave) {
-                        goldCaves.add((GoldCave) obj);
-                    }
-                }
-            }
-        }
-        return goldCaves;
-    }
-
     // Вспомогательный метод — соседние клетки
     private List<Position> getNeighbors(Position pos) {
         List<Position> neighbors = new ArrayList<>();

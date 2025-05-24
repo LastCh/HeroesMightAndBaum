@@ -7,7 +7,8 @@ public class Spearman extends Unit {
     }
 
     @Override
-    public Spearman clone() {
-        return new Spearman(); // Т.к. он без состояния, просто новый объект
+    public Spearman cloneUnit() {
+        return new Spearman();
     }
+
 }

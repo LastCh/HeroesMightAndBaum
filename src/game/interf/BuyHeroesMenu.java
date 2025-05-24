@@ -27,6 +27,8 @@ public class BuyHeroesMenu extends Inter {
 
         Runnable showGold = () -> System.out.println(BOLD + GOLD_COLOR + "💰 Ваше золото: " + player.getGold() + RESET + "\n");
         Field field = player.getMyCastle().getField();
+        Position castlePos = player.getMyCastle().getPosition();
+        Position spawnPos = field.findFreeAdjacent(castlePos);
 
         switch (choice) {
             case 1: // Эльф
@@ -35,9 +37,6 @@ public class BuyHeroesMenu extends Inter {
                     System.out.println(RED + "⚠️ Недостаточно золота для найма эльфа!" + RESET);
                     break;
                 }
-
-                Position castlePos = player.getMyCastle().getPosition();
-                Position spawnPos = field.findFreeAdjacent(castlePos);
 
                 if (spawnPos != null) {
                     PurchasableHero elf = new ElfHero(spawnPos, player.getMyCastle(), 3, 6, 120, player);
@@ -58,9 +57,6 @@ public class BuyHeroesMenu extends Inter {
                     break;
                 }
 
-                castlePos = player.getMyCastle().getPosition();
-                spawnPos = field.findFreeAdjacent(castlePos);
-
                 if (spawnPos != null) {
                     PurchasableHero orc = new OrcHero(spawnPos, player.getMyCastle(), 2, 5, 100, player);
                     field.getCell(spawnPos.x(), spawnPos.y()).addObject(orc);
@@ -80,9 +76,6 @@ public class BuyHeroesMenu extends Inter {
                     break;
                 }
 
-                castlePos = player.getMyCastle().getPosition();
-                spawnPos = field.findFreeAdjacent(castlePos);
-
                 if (spawnPos != null) {
                     PurchasableHero dwarf = new DwarfHero(spawnPos, player.getMyCastle(), 1, 4, 90, player);
                     field.getCell(spawnPos.x(), spawnPos.y()).addObject(dwarf);
@@ -94,7 +87,6 @@ public class BuyHeroesMenu extends Inter {
                     System.out.println(RED + "⚠️ Нет свободного места рядом с замком!" + RESET);
                 }
                 break;
-
 
             case 4:
                 System.out.println(CYAN + "↩️ Возврат в замковое меню..." + RESET);

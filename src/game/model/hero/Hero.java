@@ -68,8 +68,8 @@ public abstract class Hero extends FieldObject {
         double newAccumulatedMovementCoef = accumulatedMovementCoef;
 
         if (units.isEmpty()) return;
-        if (!isValidPosition(newPos)) return;
-        if (!isValidPoints(newDiag, d)) return;
+        if (isNotValidPosition(newPos)) return;
+        if (isNotValidPoints(newDiag, d)) return;
 
         newAccumulatedMovementCoef += (1.0 - field.getCell(newPos.x(), newPos.y()).getTerrainType().getModifier());
 
@@ -117,14 +117,14 @@ public abstract class Hero extends FieldObject {
         return false;
     }
 
-    public boolean isValidPosition(Position newPos) {
-        return newPos.x() >= 0 && newPos.x() < 10 && newPos.y() >= 0 && newPos.y() < 10;
+    public boolean isNotValidPosition(Position newPos) {
+        return newPos.x() < 0 || newPos.x() >= 10 || newPos.y() < 0 || newPos.y() >= 10;
     }
 
-    public boolean isValidPoints(int newDiag, int oldDiag) {
-        return (((movementPoints > 0) && (newDiag % 2 == 1)) ||
-                ((movementPoints > 1) && (newDiag % 2 == 0) && (oldDiag != 0)) ||
-                ((movementPoints > 1) && (oldDiag == 0)));
+    public boolean isNotValidPoints(int newDiag, int oldDiag) {
+        return (((movementPoints <= 0) || (newDiag % 2 != 1)) &&
+                ((movementPoints <= 1) || (newDiag % 2 != 0) || (oldDiag == 0)) &&
+                ((movementPoints <= 1) || (oldDiag != 0)));
     }
 
     public void addUnits(Unit unit) {
@@ -174,9 +174,6 @@ public abstract class Hero extends FieldObject {
     }
 
     public void updatePosition(int newX, int newY) { this.position = new Position(newX, newY); }
-
-    @Override
-    public Position getPosition() { return position; }
 
     @Override
     public String getColoredSymbol() { return String.format("%-3s", coloredSymbol); }

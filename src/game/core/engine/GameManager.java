@@ -1,7 +1,6 @@
 package game.core.engine;
 
 import game.api.Position;
-import game.interf.MenuManager;
 import game.map.Field;
 import game.model.building.onmap.Castle;
 import game.model.building.onmap.GoldCave;
@@ -19,12 +18,10 @@ public class GameManager {
     private final Scanner scanner = new Scanner(System.in);
     private Castle botCastle;
     private Castle playerCastle;
-    private final MenuManager menu = new MenuManager();
     private GameSave gameSave;
-    private String playerName;
+    private final String playerName;
     private String gameName = "name";
     private Field customField = null;
-    private int karma;
 
     public GameManager(String playerN){
         playerName = playerN;
@@ -54,6 +51,11 @@ public class GameManager {
         computer = new ComputerHero(new Position(9, 9), playerCastle.getPosition(), 2, botCastle, 500);
         field.getCell(0, 0).addObject(human);
         field.getCell(9, 9).addObject(computer);
+
+        GameSave gameSave1 = new GameSave();
+        double karma = gameSave1.loadPlayerKarma(playerName);
+        computer.addBenefit(karma);
+        LOGGER.info("Карма успешно передана противнику");
 
         for (int i = 0; i < 3; i++) {
             int x, y;
@@ -126,6 +128,11 @@ public class GameManager {
         this.human = new HumanHero(firstCastle.getPosition(), 10, firstCastle, 1000);
         this.computer = new ComputerHero(secondCastle.getPosition(), firstCastle.getPosition(), 2, secondCastle, 500);
 
+        GameSave gameSave1 = new GameSave();
+        double karma = gameSave1.loadPlayerKarma(playerName);
+        computer.addBenefit(karma);
+        LOGGER.info("Карма успешно передана противнику");
+
         field.getCell(firstCastle.getPosition().x(),firstCastle.getPosition().y()).addObject(human);
         field.getCell(firstCastle.getPosition().x(),firstCastle.getPosition().y()).addObject(computer);
 
@@ -143,8 +150,6 @@ public class GameManager {
     }
 
     public GameSave getGameSave() { return gameSave; }
-
-    public void setPlayerName(String pName) { playerName = pName; }
 
     public String getPlayerName() { return playerName; }
 

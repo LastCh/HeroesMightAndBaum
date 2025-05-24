@@ -7,7 +7,8 @@ public class Paladin extends Unit {
     }
 
     @Override
-    public Paladin clone() {
+    public Paladin cloneUnit() {
         return new Paladin();
     }
+
 }

@@ -7,7 +7,7 @@ public class Swordsman extends Unit {
     }
 
     @Override
-    public Swordsman clone() {
+    public Swordsman cloneUnit() {
         return new Swordsman();
     }
 }

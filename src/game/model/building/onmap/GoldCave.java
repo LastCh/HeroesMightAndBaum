@@ -14,7 +14,7 @@ public class GoldCave extends FieldObject implements Immovable {
     private boolean inCave = false;
     private final DungeonField dungeonField;
     private final Position caveEntry = new Position(0, 0);
-    private int artifactUses;
+    private final int artifactUses;
     private final CaveInterface ui = new CaveInterface();
 
     public GoldCave(Position position, int goldAmount) {

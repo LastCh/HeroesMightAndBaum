@@ -99,11 +99,6 @@ public class MenuManager {
                 choice = Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 System.out.println(RED + "❌ Введите целое число от 1 до 5." + RESET);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException en) {
-                    Thread.currentThread().interrupt();
-                }
                 continue;
             }
 

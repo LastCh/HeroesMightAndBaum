@@ -127,7 +127,7 @@ public class ComputerHero extends Hero {
 
     private void buyFirstSpearmanIfNeeded() {
         if (!firstUnitBought && !noHaveMoney(GameUnits.SPEARMAN.getCost())) {
-            Unit u = GameUnits.SPEARMAN.clone();
+            Unit u = GameUnits.SPEARMAN.cloneUnit();
             spendMoney(u.getCost());
             addUnits(u);
             firstUnitBought = true;
@@ -190,7 +190,7 @@ public class ComputerHero extends Hero {
                 continue;
             }
 
-            Unit copy = base.clone();
+            Unit copy = base.cloneUnit();
             spendMoney(copy.getCost());
             addUnits(copy);
             System.out.println("Компьютер купил " + copy.getClass().getSimpleName() +
@@ -375,13 +375,10 @@ public class ComputerHero extends Hero {
         }
     }
 
-    public void addBenefit(int karm) {
-        if(karm < 0){
-            karma = 0;
-        }else {
-            karma = karm;
-        }
-
+    public void addBenefit(double karm) {
+        karma = Math.max(karm, 0);
+        this.power += (int)(100 * karma);
+        this.addGold((int)(1000 * karma));
     }
 
     public int getRadius() { return radiusAttack; }

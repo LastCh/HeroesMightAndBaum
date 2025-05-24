@@ -9,7 +9,6 @@ import game.model.unit.Unit;
 public abstract class PurchasableHero extends Hero {
     protected final Hero owner;
     protected boolean preferX = true;
-    protected String color;
 
     public PurchasableHero(Position position, String color, Castle castle,
                            int movement, int points, int gold, Hero owner) {
@@ -18,7 +17,7 @@ public abstract class PurchasableHero extends Hero {
     }
 
     public void makeMove(Field field) {
-        Unit u = GameUnits.SWORDSMAN.clone();
+        Unit u = GameUnits.SWORDSMAN.cloneUnit();
         addUnits(u);
 
         // Проверка на вражеского героя в радиусе 1
@@ -115,5 +114,4 @@ public abstract class PurchasableHero extends Hero {
     @Override
     public Hero getOwner() { return owner; }
 
-    public abstract String getColor();
 }

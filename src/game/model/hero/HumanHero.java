@@ -33,8 +33,7 @@ public class HumanHero extends Hero {
 
         if(!this.isAlive()){
             field.moveObject(this, this.position.x(), this.position.y(), 0, 0);
-            Position defPos = new Position(0, 0);
-            this.position = defPos;
+            this.position = new Position(0, 0);
             ArrayList<Unit> newUni = new ArrayList<>();
             this.setUnits(newUni);
             return;
@@ -47,13 +46,13 @@ public class HumanHero extends Hero {
         }
 
         // Проверка возможность перемещения по позиции
-        if (!isValidPosition(newPos)) {
+        if (isNotValidPosition(newPos)) {
             System.out.println("Невозможно переместиться в эту позицию!");
             return;
         }
 
         // Проверка возможность перемещения по очкам диагонали
-        if (!isValidPoints(newDiag, d)) {
+        if (isNotValidPoints(newDiag, d)) {
             System.out.println("Недостаточно очков для перемещения!");
             return;
         }
@@ -146,16 +145,6 @@ public class HumanHero extends Hero {
         return false;
     }
 
-    public boolean isValidPosition(Position newPos) {
-        return newPos.x() >= 0 && newPos.x() < 10 && newPos.y() >= 0 && newPos.y() < 10;
-    }
-
-    public boolean isValidPoints(int newDiag, int oldDiag) {
-        return (((movementPoints > 0) && (newDiag % 2 == 1)) ||
-                ((movementPoints > 1) && (newDiag % 2 == 0) && (oldDiag != 0)) ||
-                ((movementPoints > 1) && (oldDiag == 0)));
-    }
-
     public void receiveArtifact(int count) {
         if (magicalArtifact == null) {
             this.magicalArtifact = new MagicalArtifact(count, this);
@@ -218,11 +207,7 @@ public class HumanHero extends Hero {
     }
 
     public boolean hasArtifact() {
-        if (magicalArtifact == null || magicalArtifact.getAmount() <= 0) {
-            return false;
-        }else {
-            return true;
-        }
+        return magicalArtifact != null && magicalArtifact.getAmount() > 0;
     }
 
     @Override

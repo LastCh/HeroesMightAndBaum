@@ -7,6 +7,7 @@ import game.map.Field;
 import game.model.building.incastle.BuildingCastle;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Castle extends FieldObject implements Immovable {
     private final ArrayList<BuildingCastle> buildings = new ArrayList<>(8);
@@ -25,9 +26,10 @@ public class Castle extends FieldObject implements Immovable {
 
     public boolean containsName(BuildingCastle obj) {
         boolean cont = false;
-        for(int i = 0; i < buildings.size(); i++ ){
-            if (obj.getNameNotStat() == buildings.get(i).getNameNotStat()) {
+        for (BuildingCastle building : buildings) {
+            if (Objects.equals(obj.getNameNotStat(), building.getNameNotStat())) {
                 cont = true;
+                break;
             }
         }
         return cont;
@@ -88,12 +90,10 @@ public class Castle extends FieldObject implements Immovable {
         return c;
     }
 
-
     @Override
     public String getClassName() {
         return "Castle";
     }
-
 
     public void takeDamage(int damage) {
         health = Math.max(health - damage, 0);
@@ -105,10 +105,6 @@ public class Castle extends FieldObject implements Immovable {
 
     public boolean isDestroyed() {
         return health <= 0;
-    }
-
-    public ArrayList<BuildingCastle> getBuildings() {
-        return buildings;
     }
 
     public Field getField() {

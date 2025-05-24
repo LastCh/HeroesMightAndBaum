@@ -10,6 +10,7 @@ import game.model.hero.HumanHero;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static game.api.LogConfig.LOGGER;
 
@@ -32,12 +33,16 @@ public class GameSave {
         this.castleComputer = cComp;
         this.field = oField;
         this.ownerName = pOwnerName;
+        this.saveName = name;
     }
 
     public static void saveGame(GameSave saveData, String slotName) {
         try {
             File dir = new File("saves");
-            if (!dir.exists()) dir.mkdirs();
+            if (!dir.exists() && !dir.mkdirs()) {
+                LOGGER.severe("Не удалось создать директорию для сохранений: " + dir.getAbsolutePath());
+                throw new IOException("Путь к файлу пуст");
+            }
 
             File file = new File(dir, slotName + ".txt");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -150,7 +155,7 @@ public class GameSave {
             reader.close();
             System.out.println("✅ Игра загружена из слота " + slotName);
 
-            int karma = loadPlayerKarma(ownerName);
+            double karma = loadPlayerKarma(ownerName);
             computerHero.addBenefit(karma);
             return new GameSave(computerHero, humanHero, castlePlayer, castleComputer, field, saveName, ownerName);
         } catch (IOException e) {
@@ -160,7 +165,7 @@ public class GameSave {
         }
     }
 
-    private int loadPlayerKarma(String playerName) {
+    public double loadPlayerKarma(String playerName) {
         File file = new File("players.txt");
         if (!file.exists()) {
             LOGGER.warning("Файл players.txt не найден.");
@@ -172,7 +177,7 @@ public class GameSave {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(";");
                 if (parts.length >= 2 && parts[0].equalsIgnoreCase(playerName)) {
-                    return Integer.parseInt(parts[1]);
+                    return Double.parseDouble(parts[1]);
                 }
             }
         } catch (IOException | NumberFormatException e) {
@@ -197,10 +202,10 @@ public class GameSave {
                         double oldKarma = Double.parseDouble(parts[1]);
                         int wins = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
                         double newKarma = oldKarma + karma;
-                        entries.add(new String[]{name, String.format("%.2f", newKarma), String.valueOf(wins)});
+                        entries.add(new String[]{name, String.format(Locale.ENGLISH,"%.1f", newKarma), String.valueOf(wins)});
                         updated = true;
                     } else {
-                        entries.add(parts); // другие строки не трогаем
+                        entries.add(parts);
                     }
                 }
             } catch (IOException | NumberFormatException e) {
@@ -210,7 +215,7 @@ public class GameSave {
 
         // Если игрок новый
         if (!updated) {
-            entries.add(new String[]{name, String.format("%.2f", karma), "0"});
+            entries.add(new String[]{name, String.format(Locale.ENGLISH,"%.1f", karma), "0"});
         }
 
         // Перезаписываем файл

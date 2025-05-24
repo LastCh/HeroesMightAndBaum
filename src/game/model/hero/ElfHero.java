@@ -4,6 +4,8 @@ import game.api.Position;
 import game.map.Field;
 import game.model.building.onmap.Castle;
 
+import java.util.Objects;
+
 public class ElfHero extends PurchasableHero {
     private static final String COLOR = "\u001B[38;5;22m";
 
@@ -13,11 +15,6 @@ public class ElfHero extends PurchasableHero {
 
     public ElfHero(Position pos, Castle castle, int power, int points, int gold, Hero owner) {
         super(pos, COLOR, castle, power, points, gold, owner);
-    }
-
-    @Override
-    public String getColor() {
-        return COLOR;
     }
 
     @Override
@@ -46,13 +43,13 @@ public class ElfHero extends PurchasableHero {
 
         ElfHero hero1 = new ElfHero(new Position(x, y), playerCastle, power, points, gold, player);
 
-        if(name == "HumanHero"){
+        if(Objects.equals(name, "HumanHero")){
             ElfHero hero = new ElfHero(new Position(x, y), playerCastle, power, points, gold, player);
             field.getCell(x, y).addObject(hero);
             hero.deserializeUnits(unitData);
             return hero;
         }
-        if(name == "ComputerHero"){
+        if(Objects.equals(name, "ComputerHero")){
             ElfHero hero = new ElfHero(new Position(x, y), compCastle, power, points, gold, Comp);
             field.getCell(x, y).addObject(hero);
             hero.deserializeUnits(unitData);

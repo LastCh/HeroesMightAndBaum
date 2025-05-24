@@ -11,7 +11,6 @@ public class LogConfig {
     }
 
     static {
-        System.out.println("Log");
         try {
             FileHandler fileHandler = new FileHandler("game.log", true);
             fileHandler.setEncoding("UTF-8");

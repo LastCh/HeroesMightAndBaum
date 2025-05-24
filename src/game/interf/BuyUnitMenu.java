@@ -45,9 +45,9 @@ public class BuyUnitMenu extends Inter {
         Runnable showGold = () -> System.out.println(BOLD + GOLD_COLOR + "💰 Ваше золото: " + player.getGold() + RESET + "\n");
         Scanner scanner = new Scanner(System.in);
 
-        Unit selectedUnit = null;
-        BuildingCastle requiredBuilding = null;
-        String successMessage = "";
+        Unit selectedUnit;
+        BuildingCastle requiredBuilding;
+        String successMessage;
 
         switch (choice) {
             case 1:
@@ -109,7 +109,7 @@ public class BuyUnitMenu extends Inter {
 
         player.spendMoney(totalCost);
         for (int i = 0; i < count; i++) {
-            player.addUnits(selectedUnit.clone());
+            player.addUnits(selectedUnit.cloneUnit());
         }
 
         showGold.run();

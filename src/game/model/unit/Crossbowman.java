@@ -7,7 +7,7 @@ public class Crossbowman extends Unit {
     }
 
     @Override
-    public Crossbowman clone() {
+    public Crossbowman cloneUnit() {
         return new Crossbowman();
     }
 }

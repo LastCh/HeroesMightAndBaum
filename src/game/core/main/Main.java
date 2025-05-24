@@ -1,6 +1,5 @@
 package game.core.main;
 
-import game.api.LogConfig;
 import game.interf.MenuManager;
 
 import static game.api.LogConfig.LOGGER;
@@ -8,8 +7,6 @@ import static game.api.LogConfig.LOGGER;
 
 public class Main {
     public static void main(String[] args) {
-        LogConfig logConf = new LogConfig();
-        logConf.getClass();
         LOGGER.info("Начало генерации карты");
         MenuManager menuManager = new MenuManager();
         menuManager.run();
