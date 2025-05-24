@@ -27,6 +27,10 @@ public abstract class FieldObject {
         return priority;
     }
 
+    public void setColoredSymbol(String symb) {
+        coloredSymbol = symb;
+    }
+
     public abstract String serialize();           // состояние объекта
     public abstract String getClassName();        // имя класса для восстановления
 }

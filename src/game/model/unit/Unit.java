@@ -12,6 +12,10 @@ public class Unit {
         return cost;
     }
 
+    public void setPower(int pow){
+        power = pow;
+    }
+
     public Unit cloneUnit() {
         return new Unit();
     }

@@ -23,6 +23,10 @@ public enum TerrainType {
         return backgroundColor + textColor + " " + symbol + " " + "\u001B[0m";
     }
 
+    public String getColoredBackground(){
+        return backgroundColor;
+    }
+
     public double getModifier() {
         return movementModifier;
     }

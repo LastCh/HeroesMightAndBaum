@@ -4,25 +4,28 @@ import game.api.FieldObject;
 import game.api.Position;
 import game.map.Field;
 import game.model.building.incastle.GameBuildings;
-import game.model.building.onmap.Castle;
-import game.model.building.onmap.GoldCave;
+import game.model.building.onmap.*;
 import game.model.item.MagicalArtifact;
 import game.model.monster.Zombie;
 import game.model.unit.Unit;
+import game.service.ServiceType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HumanHero extends Hero {
+public class HumanHero extends Hero implements ServiceVisitor {
     private static final String COLOR = "\u001B[34m";
     boolean speedStableBonus = false;
     private MagicalArtifact magicalArtifact;
     private String name;
     private double karma = 0;
+    private boolean fastCastleCapture = false;
+    private int maxHP;
 
     public HumanHero(Position startPosition, int points, Castle castle, int gold) {
         super(startPosition, COLOR, castle, 10, points, gold);
         this.movementPoints = points;
+        this.maxHP = health;
     }
 
     public void move(int dx, int dy, Field field, int d) {
@@ -61,7 +64,7 @@ public class HumanHero extends Hero {
         newAccumulatedMovementCoef += (1.0 - field.getCell(newPos.x(), newPos.y()).getTerrainType().getModifier());
 
         // Проверка на атаку замка
-        if (castleCheck(field, newPos)) {
+        if (interactWithBuildings(field, newPos)) {
             return;
         }
 
@@ -112,24 +115,41 @@ public class HumanHero extends Hero {
     }
 
     public boolean targetCheck(Field field, Position newPos) {
-        ComputerHero target = field.getComputerHeroAt(newPos);
-        if (target != null) {
-            this.attack(target);
-            if(!target.isAlive()){
-                karma+=0.1;
+        // Проверяем героя-компьютера
+        ComputerHero computerHero = field.getComputerHeroAt(newPos);
+        if (computerHero != null) {
+            this.attack(computerHero);
+            if (!computerHero.isAlive()) {
+                karma += 0.1;
             }
             spendMovementPoints(1);
             return true;
-        } else {
-            return false;
         }
+
+        // Проверяем наёмников компьютера (PurchasableHero)
+        Hero enemy = field.getHeroAt(newPos);
+        if (enemy instanceof PurchasableHero purchasable && purchasable.getOwner() instanceof ComputerHero) {
+            this.attack(enemy);
+            if (!enemy.isAlive()) {
+                karma += 0.05;
+                field.removePlayer(enemy);
+            }
+            spendMovementPoints(1);
+            return true;
+        }
+
+        return false;
     }
 
-    public boolean castleCheck(Field field, Position newPos) {
+    public boolean interactWithBuildings(Field field, Position newPos) {
         Castle castle = field.getCastleAt(newPos);
         if (castle != null) {
             if (castle != myCastle) {
-                castle.takeDamage(power);
+                if(fastCastleCapture){
+                    castle.takeDamage(2*power);
+                }else{
+                    castle.takeDamage(power);
+                }
                 System.out.println("Вы атакуете вражеский замок!");
             } else {
                 System.out.println("Вы находитесь в своём замке!");
@@ -142,6 +162,40 @@ public class HumanHero extends Hero {
             }
             return true;
         }
+
+        for (FieldObject obj : field.getCell(newPos.x(), newPos.y()).getObjects()) {
+            if (obj instanceof Enterprise enterprise) {
+                System.out.println("🏪 Вы вошли в здание: " + enterprise.getClassName());
+
+                int choice;
+                do {
+                    choice = enterprise.displayMenu();
+
+                    switch (enterprise.getClassName()) {
+                        case "Barbershop" -> {
+                            if (choice == 1) enterprise.enter(this, Barbershop.SIMPLE_CUT);
+                            else if (choice == 2) enterprise.enter(this, Barbershop.FASHION_CUT);
+                        }
+                        case "Hotel" -> {
+                            if (choice == 1) enterprise.enter(this, Hotel.SHORT_REST);
+                            else if (choice == 2) enterprise.enter(this, Hotel.LONG_REST);
+                        }
+                        case "Restaurant" -> {
+                            if (choice == 1) enterprise.enter(this, Restaurant.SNACK);
+                            else if (choice == 2) enterprise.enter(this, Restaurant.LUNCH);
+                        }
+                    }
+
+                    if (choice == 3) {         // «Выйти» в вашем меню
+                        enterprise.shutdown();
+                        break;
+                    }
+                } while (true);
+
+                return false;
+            }
+        }
+
         return false;
     }
 
@@ -164,8 +218,8 @@ public class HumanHero extends Hero {
             magicalArtifact = null;
         }
         target.takeDamage(target.getHealth());
-        System.out.println("💥 Артефакт активирован! Враг уничтожен.");
-        karma += 0.1;
+        System.out.println("💥 Артефакт активирован! Вы испепелили всё живое на клетке.");
+        karma += 0.3;
         return true;
     }
 
@@ -234,7 +288,12 @@ public class HumanHero extends Hero {
         boolean speedBonus = Boolean.parseBoolean(parts[3]);
         int artifacts = Integer.parseInt(parts[4]);
         String[] pos = parts[5].split(",");
-        String unitData = parts.length > 6 ? parts[6] : "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 6; i < parts.length; i++) {
+            sb.append(parts[i]);
+            if (i < parts.length - 1) sb.append(";");
+        }
+        String unitData = sb.toString();
 
         Position position = new Position(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]));
         HumanHero hero = new HumanHero(position, 10, myCastle, gold);
@@ -247,6 +306,10 @@ public class HumanHero extends Hero {
         }
 
         hero.deserializeUnits(unitData);
+        int totalPower = hero.getUnits().stream()
+                .mapToInt(Unit::getPower)
+                .sum();
+        hero.setPower(totalPower);
         field.getCell(position.x(), position.y()).addObject(hero);
         return hero;
     }
@@ -256,4 +319,28 @@ public class HumanHero extends Hero {
     public void resetKarma() { karma = 0; }
 
     public void addKarma(double karm) { karma += karm; }
+
+    public String getName() {
+        return "Герой";
+    }
+
+    public void applyBonus(ServiceType service) {
+
+    }
+
+    public void healUnits(int heal) {
+        this.maxHP += heal;
+        this.health = maxHP;
+        System.out.println("🛌 Отряд отдохнул " + heal + " HP. Текущее: " + this.health);
+    }
+
+    public void boostMovement(int points) {
+        this.movementPoints += points;
+        System.out.println("💨 Герой получил +" + points + " к очкам передвижения. Текущие: " + this.movementPoints);
+    }
+
+    public void reduceCastleCaptureTime() {
+        fastCastleCapture = true;
+        System.out.println("🏰 Теперь вы быстрее захватите замок!");
+    }
 }

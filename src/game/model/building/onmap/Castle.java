@@ -13,11 +13,13 @@ public class Castle extends FieldObject implements Immovable {
     private final ArrayList<BuildingCastle> buildings = new ArrayList<>(8);
     private int health;
     private final Field field;
+    private final String colorCode;
 
-    public Castle(Position position, int maxHe, Field field) {
+    public Castle(Position position, int maxHe, Field field, String colorCode) {
         super(position, "♜", 2);
         this.health = maxHe;
         this.field = field;
+        this.colorCode = colorCode;
     }
 
     public boolean contains(BuildingCastle obj) {
@@ -39,8 +41,9 @@ public class Castle extends FieldObject implements Immovable {
         buildings.add(build);
     }
 
-    public Castle(Position position, String color, int maxHe, Field field) {
-        super(position, color + "♜♜" + "\u001B[0m", 2);
+    public Castle(Position position, String colorCode, int maxHe, Field field) {
+        super(position, "\u001B[" + colorCode + "m♜♜\u001B[0m", 2);
+        this.colorCode = colorCode; // Сохраняем только код цвета (напр., "34;47")
         this.health = maxHe;
         this.field = field;
     }
@@ -48,46 +51,82 @@ public class Castle extends FieldObject implements Immovable {
     @Override
     public String serialize() {
         StringBuilder sb = new StringBuilder();
-        sb.append(position.x()).append(",").append(position.y()).append(";")
-                .append(health).append(";")
-                .append(coloredSymbol).append(";");
+        sb.append(position.x()).append(",").append(position.y())
+                .append(";").append(health)
+                .append(";").append(colorCode.replace(";", "-")); // Заменяем ';' на '-' внутри colorCode
 
-        for (int i = 0; i < buildings.size(); i++) {
-            sb.append(buildings.get(i).getClass().getSimpleName());
-            if (i < buildings.size() - 1) sb.append(",");
+        if (!buildings.isEmpty()) {
+            sb.append(";");
+            for (int i = 0; i < buildings.size(); i++) {
+                sb.append(buildings.get(i).getClass().getSimpleName());
+                if (i < buildings.size() - 1) sb.append(",");
+            }
         }
-
         return sb.toString();
     }
 
 
     public static Castle deserialize(String data, Field field) {
-        String[] parts = data.split(";", -1); // <- важно: -1, чтобы не терялись пустые части
+        try {
+            int firstSemicolon = data.indexOf(';');
+            int secondSemicolon = data.indexOf(';', firstSemicolon + 1);
+            int thirdSemicolon = data.indexOf(';', secondSemicolon + 1);
 
-        String[] coords = parts[0].split(",");
-        int x = Integer.parseInt(coords[0]);
-        int y = Integer.parseInt(coords[1]);
-        int health = Integer.parseInt(parts[1]);
-        String color = parts[2]; // цветовая строка
-        Castle c = new Castle(new Position(x, y), health, field);
-        c.setColoredSymbol(color);
+            if (firstSemicolon == -1 || secondSemicolon == -1) {
+                System.out.println("❌ Неверный формат данных замка: " + data);
+                return null;
+            }
 
-        if (parts.length > 3 && !parts[4].isEmpty()) {
-            String[] buildingNames = parts[4].split(",");
-            for (String name : buildingNames) {
-                try {
-                    Class<?> clazz = Class.forName("game.model.building.incastle." + name);
-                    Object instance = clazz.getDeclaredConstructor().newInstance();
-                    if (instance instanceof BuildingCastle building) {
-                        c.addBuilding(building);
+            String[] coords = data.substring(0, firstSemicolon).split(",");
+            if (coords.length != 2) {
+                System.out.println("❌ Ошибка в координатах замка: " + data);
+                return null;
+            }
+            int x = Integer.parseInt(coords[0]);
+            int y = Integer.parseInt(coords[1]);
+
+            int health = Integer.parseInt(data.substring(firstSemicolon + 1, secondSemicolon));
+
+            String colorCode;
+            String buildingsData = null;
+
+            if (thirdSemicolon != -1) {
+                colorCode = data.substring(secondSemicolon + 1, thirdSemicolon).replace("-", ";");
+                buildingsData = data.substring(thirdSemicolon + 1);
+            } else {
+                colorCode = data.substring(secondSemicolon + 1).replace("-", ";");
+            }
+
+            Castle castle = new Castle(new Position(x, y), colorCode, health, field);
+
+            if (buildingsData != null && !buildingsData.isEmpty()) {
+                String[] buildings = buildingsData.split(",");
+                for (String name : buildings) {
+                    try {
+                        Class<?> cls = Class.forName("game.model.building.incastle." + name);
+                        BuildingCastle building = (BuildingCastle) cls.getDeclaredConstructor().newInstance();
+                        castle.addBuilding(building);
+                    } catch (Exception ex) {
+                        System.out.println("❌ Не удалось загрузить здание: " + name);
                     }
-                } catch (Exception e) {
-                    System.out.println("❌ Не удалось загрузить здание: " + name);
                 }
             }
-        }
 
-        return c;
+            return castle;
+        } catch (Exception e) {
+            System.out.println("❌ Критическая ошибка при загрузке замка: " + data);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public boolean isPlayerCastle() {
+        return colorCode.equals("34;47");
+    }
+
+    public boolean isComputerCastle() {
+        return colorCode.equals("31;47");
     }
 
     @Override
@@ -111,7 +150,4 @@ public class Castle extends FieldObject implements Immovable {
         return field;
     }
 
-    public void setColoredSymbol(String symb) {
-        coloredSymbol = symb;
-    }
 }

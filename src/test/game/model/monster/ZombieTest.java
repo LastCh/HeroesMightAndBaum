@@ -19,7 +19,7 @@ class ZombieTest {
     @BeforeEach
     void setup() {
         field = new Field(5, 5);
-        dummyCastle = new Castle(new Position(0, 0), 100, field);
+        dummyCastle = new Castle(new Position(0, 0), 100, field, "31;47");
         zombie = new Zombie(new Position(2, 2), 50);
         target = new HumanHero(new Position(2, 3), 5, dummyCastle, 100);
     }

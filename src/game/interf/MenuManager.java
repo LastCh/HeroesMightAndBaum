@@ -1,12 +1,13 @@
 package game.interf;
 
-import game.core.engine.GameManager;
-import game.core.engine.GameSave;
+import game.core.engine.*;
 import game.map.Field;
 import game.model.hero.ComputerHero;
 import game.model.hero.HumanHero;
 
 import java.io.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -20,6 +21,7 @@ public class MenuManager {
     private final CastleMenu castleMenu = new CastleMenu();
     private final GameMenu gameMenu = new GameMenu();
     private GameManager gmanager;
+    private final Scanner scanner = new Scanner(System.in);
 
     public void run() {
         Scanner scanner = new Scanner(System.in);
@@ -38,7 +40,7 @@ public class MenuManager {
         System.out.println("Добро пожаловать, " + playerName + "!");
         this.gmanager = new GameManager(playerName);
 
-        updatePlayerInfo(playerName, 0);
+        KarmaManager.updatePlayerKarma(playerName, 0);
 
         while (true) {
             startMenu.display();
@@ -59,7 +61,7 @@ public class MenuManager {
                 }
                 case 4 -> {
                     Field customField = MapEditor.editMap(10, 10);
-                    gmanager.setCustomField(customField); // нужен метод в GameManager
+                    gmanager.setCustomField(customField);
                 }
                 case 5 -> {
                     LOGGER.info("Пользователь вышел из игры.");
@@ -77,7 +79,6 @@ public class MenuManager {
 
     public boolean showGameMenu(HumanHero hplayer, ComputerHero cplayer, GameManager gmanager) {
         Scanner scanner = new Scanner(System.in);
-
         while (true) {
             clearConsole();
             System.out.println("\n" +
@@ -122,6 +123,7 @@ public class MenuManager {
                 }
                 case 5 -> {
                     clearConsole();
+                    saveGameAuto(gmanager);
                     return true;
                 }
                 default -> {
@@ -131,23 +133,25 @@ public class MenuManager {
         }
     }
 
-
     public void clearConsole() {
         for (int i = 0; i < 50; i++) System.out.println();
     }
 
     private void saveGame(GameManager gmanager) {
-        Scanner scanner = new Scanner(System.in);
-
         String saveName = null;
         while (saveName == null || saveName.trim().isEmpty()) {
-            System.out.println("Введиет название сохранения:");
+            System.out.println("Введите название сохранения:");
             saveName = scanner.nextLine().trim();
             if (saveName.isEmpty()) {
                 System.out.println("❗ Имя не может быть пустым. Попробуйте снова.");
             }
         }
 
+        GameSave.saveGame(gmanager.getGameSave(), saveName);
+    }
+
+    private void saveGameAuto(GameManager gmanager) {
+        String saveName = "autoSave"+gmanager.getPlayerName();
         GameSave.saveGame(gmanager.getGameSave(), saveName);
     }
 
@@ -172,51 +176,26 @@ public class MenuManager {
 
     private void showLeaderboard() {
         clearConsole();
-        File file = new File("players.txt");
 
-        if (!file.exists()) {
-            System.out.println(RED + "❌ Таблица лидеров недоступна: файл players.txt не найден." + RESET);
+        List<VictoryManager.PlayerStats> players = VictoryManager.loadAllStats();
+        if (players.isEmpty()) {
+            System.out.println(RED + "❌ Таблица лидеров недоступна: нет данных." + RESET);
             return;
         }
-
-        List<String[]> players = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(";");
-                if (parts.length >= 2) {
-                    if (parts.length < 3) {
-                        parts = new String[]{parts[0], parts[1], "0"};
-                    }
-                    players.add(parts);
-                }
-            }
-        }
-        catch (IOException e) {
-            System.out.println(RED + "Ошибка чтения players.txt" + RESET);
-            return;
-        }
-
-        players.sort((a, b) -> {
-            int winsA = Integer.parseInt(a[2].trim());
-            int winsB = Integer.parseInt(b[2].trim());
-
-            double karmaA = Double.parseDouble(a[1].replace(',', '.'));
-            double karmaB = Double.parseDouble(b[1].replace(',', '.'));
-
-            if (winsA != winsB) return Integer.compare(winsB, winsA);
-            return Double.compare(karmaB, karmaA);
-        });
-
 
         System.out.println(GREEN + BOLD + "Таблица лидеров:" + RESET);
         System.out.println("-----------------------------------------");
         System.out.printf("%-15s %-10s %-10s%n", "Имя", "Карма", "Победы");
         System.out.println("-----------------------------------------");
 
-        for (String[] p : players) {
-            System.out.printf("%-15s %-10s %-10s%n", p[0], p[1], p[2]);
+        // используем тот же формат, что и в KarmaManager
+        DecimalFormat karmaFmt = new DecimalFormat("0.#",
+                DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
+        for (VictoryManager.PlayerStats p : players) {
+            String karmaStr = karmaFmt.format(p.getKarma());
+            System.out.printf("%-15s %-10s %-10d%n",
+                    p.getName(), karmaStr, p.getWins());
         }
 
         System.out.println("\nНажмите Enter для возврата...");
@@ -304,48 +283,6 @@ public class MenuManager {
     }
 
 
-    private void updatePlayerInfo(String name, double addedKarma) {
-        File file = new File("players.txt");
-        List<String[]> lines = new ArrayList<>();
-        boolean updated = false;
-
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(";");
-                    if (parts[0].equalsIgnoreCase(name)) {
-                        double karma = parts.length >= 2 ? Double.parseDouble(parts[1].replace(',', '.')) : 0;
-                        int wins = parts.length >= 3 ? Integer.parseInt(parts[2].replace(',', '.')) : 0;
-                        karma += addedKarma;
-                        lines.add(new String[]{name, String.format(Locale.US, "%.2f", karma), String.valueOf(wins)});
-
-                        updated = true;
-                    } else {
-                        lines.add(parts);
-                    }
-                }
-            } catch (IOException | NumberFormatException e) {
-                LOGGER.severe("Ошибка чтения players.txt: " + e.getMessage());
-            }
-        }
-
-        if (!updated) {
-            lines.add(new String[]{name, String.format("%.2f", addedKarma), "0"});
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (String[] line : lines) {
-                writer.write(String.join(";", line));
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Ошибка записи в players.txt: " + e.getMessage());
-        }
-
-        LOGGER.info("Игрок " + name + " успешно обновлён или добавлен.");
-    }
-
     private void handleCastleMenu(HumanHero player) {
         int result;
         do {
@@ -379,7 +316,7 @@ public class MenuManager {
                 gmanager.startGame();
             }
             case "2" -> {
-                Field customField = loadCustomMap();
+                Field customField = MapEditor.loadCustomMap();
                 if (customField != null) {
                     gmanager.setCustomField(customField);
                     gmanager.startGameFromCustomMap();
@@ -390,43 +327,6 @@ public class MenuManager {
             default -> System.out.println("❌ Неверный выбор.");
         }
     }
-
-    private Field loadCustomMap() {
-        File dir = new File("custom_maps");
-        if (!dir.exists() || !dir.isDirectory()) {
-            System.out.println("❌ Папка custom_maps не найдена.");
-            return null;
-        }
-
-        File[] files = dir.listFiles((f, name) -> name.endsWith(".map"));
-        if (files == null || files.length == 0) {
-            System.out.println("❌ Нет доступных пользовательских карт.");
-            return null;
-        }
-
-        System.out.println("Выберите карту(название до точки):");
-        for (int i = 0; i < files.length; i++) {
-            System.out.println((i + 1) + ". " + files[i].getName());
-        }
-
-        Scanner scanner = new Scanner(System.in);
-        int choice;
-        try {
-            choice = Integer.parseInt(scanner.nextLine().trim()) - 1;
-        } catch (NumberFormatException e) {
-            System.out.println("❌ Неверный формат.");
-            return null;
-        }
-
-        if (choice < 0 || choice >= files.length) {
-            System.out.println("❌ Неверный номер.");
-            return null;
-        }
-
-        return MapEditor.loadCustomMap(files[choice]);
-    }
-
-
 
     public GameMenu getGameMenu() {
         return gameMenu;

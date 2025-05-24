@@ -110,6 +110,13 @@ public abstract class PurchasableHero extends Hero {
     @Override
     public abstract String getClassName();
 
+    public int getMaxMovementPoints() {
+        return maxMovementPoints;
+    }
+
+    public void setMaxMovementPoints(int points) {
+        maxMovementPoints = points;
+    }
 
     @Override
     public Hero getOwner() { return owner; }

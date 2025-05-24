@@ -9,7 +9,7 @@ import game.model.unit.*;
 
 import java.util.ArrayList;
 
-public abstract class Hero extends FieldObject {
+public abstract class Hero extends FieldObject{
     protected ArrayList<Unit> units = new ArrayList<>();
     protected Castle myCastle;
     protected int maxMovementPoints;
@@ -28,7 +28,7 @@ public abstract class Hero extends FieldObject {
         super(startPosition, colorCode + "☻" + " " + "\u001B[0m", priority);
         this.maxMovementPoints = points;
         this.movementPoints = 0;
-        this.health = 100;  // Добавить
+        this.health = 100;
         this.power = 0;
         this.coloredSymbol = colorCode + "☻" + " " + "\u001B[0m";
         this.myCastle = castle;

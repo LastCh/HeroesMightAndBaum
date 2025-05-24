@@ -144,6 +144,8 @@ public class Field {
         return null;
     }
 
+
+
     public void removePlayer(Hero player) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

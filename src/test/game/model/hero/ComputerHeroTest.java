@@ -70,9 +70,9 @@ class ComputerHeroTest {
     void testEnhanceRadiusIncreasesIfEnoughCrossbowmen() {
         aiHero.setRadius(1);
         aiHero.setUnits(new java.util.ArrayList<>(List.of(
-                GameUnits.CROSSBOWMAN.clone(),
-                GameUnits.CROSSBOWMAN.clone(),
-                GameUnits.CROSSBOWMAN.clone()
+                GameUnits.CROSSBOWMAN.cloneUnit(),
+                GameUnits.CROSSBOWMAN.cloneUnit(),
+                GameUnits.CROSSBOWMAN.cloneUnit()
         )));
         aiHero.enhanceRadius(aiHero.getUnits());
         assertEquals(2, aiHero.getRadius());
@@ -80,7 +80,7 @@ class ComputerHeroTest {
 
     @Test
     void testSerializeAndDeserialize() {
-        aiHero.addUnits(GameUnits.SPEARMAN.clone());
+        aiHero.addUnits(GameUnits.SPEARMAN.cloneUnit());
         String serialized = aiHero.serialize();
 
         ComputerHero copy = ComputerHero.deserialize(serialized, field, aiCastle);

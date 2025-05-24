@@ -79,7 +79,7 @@ class HeroTest {
     @Test
     void testSerializeAndDeserializeUnits() {
         hero.addUnits(new Spearman());
-        hero.addUnits(GameUnits.SWORDSMAN.clone());
+        hero.addUnits(GameUnits.SWORDSMAN.cloneUnit());
 
         String serialized = hero.serializeUnits();
 

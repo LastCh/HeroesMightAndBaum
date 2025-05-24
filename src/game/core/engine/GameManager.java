@@ -1,13 +1,15 @@
 package game.core.engine;
 
 import game.api.Position;
+import game.map.Cell;
 import game.map.Field;
-import game.model.building.onmap.Castle;
-import game.model.building.onmap.GoldCave;
+import game.map.TerrainType;
+import game.model.building.onmap.*;
 import game.model.hero.HumanHero;
 import game.model.hero.ComputerHero;
 
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static game.api.LogConfig.LOGGER;
 
@@ -34,14 +36,14 @@ public class GameManager {
         LOGGER.info("Карта сгенерирована");
 
         try {
-            botCastle = new Castle(new Position(8, 8), "\u001B[31;47m", 2000, field);
-            playerCastle = new Castle(new Position(1, 1),  "\u001B[34;47m", 2000, field);
+            botCastle = new Castle(new Position(8, 8), "31;47", 2000, field);
+            playerCastle = new Castle(new Position(1, 1),  "34;47", 2000, field);
         } catch (Exception e) {
             LOGGER.severe("Ошибка при создании замков: " + e.getMessage());
         }
 
-        field.getCell(8, 8).addObject(botCastle);
-        field.getCell(1, 1).addObject(playerCastle);
+        if (botCastle != null) field.getCell(botCastle.getPosition().x(),botCastle.getPosition().y()).addObject(botCastle);
+        if (playerCastle != null) field.getCell(playerCastle.getPosition().x(),playerCastle.getPosition().y()).addObject(playerCastle);
 
         if (botCastle == null || playerCastle == null) {
             LOGGER.warning("Один из замков не инициализирован!");
@@ -49,15 +51,14 @@ public class GameManager {
 
         human = new HumanHero(new Position(0, 0), 10, playerCastle, 1000);
         computer = new ComputerHero(new Position(9, 9), playerCastle.getPosition(), 2, botCastle, 500);
-        field.getCell(0, 0).addObject(human);
-        field.getCell(9, 9).addObject(computer);
+        field.getCell(human.getPosition().x(),human.getPosition().y()).addObject(human);
+        field.getCell(computer.getPosition().x(),computer.getPosition().y()).addObject(computer);
 
-        GameSave gameSave1 = new GameSave();
-        double karma = gameSave1.loadPlayerKarma(playerName);
+        double karma = KarmaManager.loadPlayerKarma(playerName);
         computer.addBenefit(karma);
-        LOGGER.info("Карма успешно передана противнику");
+        LOGGER.info("Эффект от дурной славы успешно передан противнику");
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < ThreadLocalRandom.current().nextInt(2, 5); i++) {
             int x, y;
             do {
                 x = (int) (Math.random() * field.getWidth());
@@ -65,6 +66,47 @@ public class GameManager {
             } while (!field.getCell(x, y).isEmpty());
             GoldCave cave = new GoldCave(new Position(x, y), 500 + i * 100);
             field.getCell(x, y).addObject(cave);
+        }
+
+        int buildingsToPlace = ThreadLocalRandom.current().nextInt(3, 7);
+        int attemptsLimit = 100;
+
+        while (buildingsToPlace > 0 && attemptsLimit-- > 0) {
+
+            int x = ThreadLocalRandom.current().nextInt(field.getWidth());
+            int y = ThreadLocalRandom.current().nextInt(field.getHeight());
+
+            if (!field.getCell(x, y).isEmpty()) continue;
+
+            Enterprise ent = null;
+            int typeAttempts = 5;
+
+            while (ent == null && typeAttempts-- > 0) {
+                int kind = ThreadLocalRandom.current().nextInt(3);   // 0..2
+
+                switch (kind) {
+                    case 0 -> ent = new Barbershop(
+                            new Position(x, y), field,
+                            field.getCell(x, y).getTerrainType().getColoredBackground());
+
+                    case 1 -> ent = new Restaurant(
+                            new Position(x, y), field,
+                            field.getCell(x, y).getTerrainType().getColoredBackground());
+
+                    case 2 -> {
+                        if (hasMountainNeighbour(field, x, y)) {
+                            ent = new Hotel(
+                                    new Position(x, y), field,
+                                    field.getCell(x, y).getTerrainType().getColoredBackground());
+                        }
+                    }
+                }
+            }
+
+            if (ent != null) {
+                field.getCell(x, y).addObject(ent);
+                buildingsToPlace--;
+            }
         }
 
         gameSave = new GameSave(computer, human, playerCastle, botCastle, field, gameName, playerName);
@@ -128,13 +170,12 @@ public class GameManager {
         this.human = new HumanHero(firstCastle.getPosition(), 10, firstCastle, 1000);
         this.computer = new ComputerHero(secondCastle.getPosition(), firstCastle.getPosition(), 2, secondCastle, 500);
 
-        GameSave gameSave1 = new GameSave();
-        double karma = gameSave1.loadPlayerKarma(playerName);
+        double karma = KarmaManager.loadPlayerKarma(playerName);
         computer.addBenefit(karma);
         LOGGER.info("Карма успешно передана противнику");
 
-        field.getCell(firstCastle.getPosition().x(),firstCastle.getPosition().y()).addObject(human);
-        field.getCell(firstCastle.getPosition().x(),firstCastle.getPosition().y()).addObject(computer);
+        field.getCell(human.getPosition().x(), human.getPosition().y()).addObject(human);
+        field.getCell(computer.getPosition().x(), computer.getPosition().y()).addObject(computer);
 
         this.gameSave = new GameSave(computer, human, playerCastle, botCastle, field, gameName, playerName);
 
@@ -144,6 +185,18 @@ public class GameManager {
         render.startGameLoop(this);
     }
 
+    private static boolean hasMountainNeighbour(Field f, int cx, int cy) {
+        int[] dx = {-1, 0, 1, 0};
+        int[] dy = {0, -1, 0, 1};
+
+        for (int i = 0; i < 4; i++) {
+            int nx = cx + dx[i], ny = cy + dy[i];
+            Cell n = f.getCell(nx, ny);
+            if (n != null && n.getTerrainType() == TerrainType.MOUNTAIN)
+                return true;
+        }
+        return false;
+    }
 
     public void clearConsole() {
         for (int i = 0; i < 50; i++) System.out.println();

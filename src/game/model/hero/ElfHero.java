@@ -15,6 +15,7 @@ public class ElfHero extends PurchasableHero {
 
     public ElfHero(Position pos, Castle castle, int power, int points, int gold, Hero owner) {
         super(pos, COLOR, castle, power, points, gold, owner);
+        this.maxMovementPoints = points;
     }
 
     @Override
@@ -30,7 +31,9 @@ public class ElfHero extends PurchasableHero {
                 serializeUnits();
     }
 
-    public static ElfHero deserialize(String data, Field field, Castle playerCastle, Castle compCastle , Hero player, Hero Comp) {
+    public static ElfHero deserialize(String data, Field field,
+                                      Castle playerCastle, Castle compCastle,
+                                      Hero player, Hero comp) {
         String[] parts = data.split(";");
         String[] pos = parts[0].split(",");
         int x = Integer.parseInt(pos[0]);
@@ -38,25 +41,19 @@ public class ElfHero extends PurchasableHero {
         int power = Integer.parseInt(parts[1]);
         int points = Integer.parseInt(parts[2]);
         int gold = Integer.parseInt(parts[3]);
-        String name = parts[4];
+        String ownerName = parts[4];
         String unitData = parts.length > 5 ? parts[5] : "";
 
-        ElfHero hero1 = new ElfHero(new Position(x, y), playerCastle, power, points, gold, player);
-
-        if(Objects.equals(name, "HumanHero")){
-            ElfHero hero = new ElfHero(new Position(x, y), playerCastle, power, points, gold, player);
-            field.getCell(x, y).addObject(hero);
-            hero.deserializeUnits(unitData);
-            return hero;
+        ElfHero hero;
+        if (Objects.equals(ownerName, "HumanHero")) {
+            hero = new ElfHero(new Position(x, y), playerCastle, power, points, gold, player);
+        } else {
+            hero = new ElfHero(new Position(x, y), compCastle, power, points, gold, comp);
         }
-        if(Objects.equals(name, "ComputerHero")){
-            ElfHero hero = new ElfHero(new Position(x, y), compCastle, power, points, gold, Comp);
-            field.getCell(x, y).addObject(hero);
-            hero.deserializeUnits(unitData);
-            return hero;
-        }
-        return hero1;
+        hero.deserializeUnits(unitData);
+        return hero;
     }
+
 
 
 }

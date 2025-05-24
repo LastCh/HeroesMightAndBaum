@@ -1,8 +1,7 @@
 package game.map;
 
 import game.api.FieldObject;
-import game.model.building.onmap.Castle;
-import game.model.building.onmap.GoldCave;
+import game.model.building.onmap.*;
 import game.model.hero.*;
 
 import java.util.List;
@@ -79,18 +78,21 @@ public class Cell {
 
         for (int i = 1; i < parts.length; i++) {
             String[] objParts = parts[i].split("#", 2);
-            String type = objParts[0];
+            String type    = objParts[0];
             String objData = objParts[1];
 
             FieldObject obj = switch (type) {
-                case "Castle" -> null;
-                case "GoldCave" -> GoldCave.deserialize(objData);
-                case "HumanHero" -> null;
-                case "ComputerHero" -> null;
-                case "ElfHero" -> ElfHero.deserialize(objData, field,castlePlayer, castleComputer, humanHero, computerHero);
-                case "OrcHero" -> OrcHero.deserialize(objData, field,castlePlayer, castleComputer, humanHero, computerHero);
-                case "DwarfHero" -> DwarfHero.deserialize(objData, field,castlePlayer, castleComputer, humanHero, computerHero);
-                default -> null;
+                case "Castle"      -> null;  // замок в ячейке отрабатывается отдельно
+                case "GoldCave"    -> GoldCave.deserialize(objData);
+                case "Barbershop"  -> Barbershop.deserialize(objData, field);
+                case "Hotel"       -> Hotel.deserialize(objData, field);
+                case "Restaurant"  -> Restaurant.deserialize(objData, field);
+                case "HumanHero"   -> null;
+                case "ComputerHero"-> null;
+                case "ElfHero"     -> ElfHero.deserialize(objData, field, castlePlayer, castleComputer, humanHero, computerHero);
+                case "OrcHero"     -> OrcHero.deserialize(objData, field, castlePlayer, castleComputer, humanHero, computerHero);
+                case "DwarfHero"   -> DwarfHero.deserialize(objData, field, castlePlayer, castleComputer, humanHero, computerHero);
+                default            -> null;
             };
 
             if (obj != null) {
@@ -100,4 +102,5 @@ public class Cell {
 
         return cell;
     }
+
 }

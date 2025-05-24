@@ -19,7 +19,7 @@ class HumanHeroTest {
     @BeforeEach
     void setup() {
         field = new Field(10, 10);
-        castle = new Castle(new Position(1, 1), 1000, field);
+        castle = new Castle(new Position(1, 1), 1000, field, "31;47");
         field.getCell(1, 1).addObject(castle);
         hero = new HumanHero(new Position(2, 2), 5, castle, 300);
         field.getCell(2, 2).addObject(hero);
@@ -75,7 +75,7 @@ class HumanHeroTest {
     @Test
     void testSerializationAndDeserialization() {
         hero.receiveArtifact(2);
-        hero.addUnits(GameUnits.SPEARMAN.clone());
+        hero.addUnits(GameUnits.SPEARMAN.cloneUnit());
 
         String data = hero.serialize();
         HumanHero restored = HumanHero.deserialize(data, field, castle);

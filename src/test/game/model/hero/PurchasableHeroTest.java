@@ -21,8 +21,8 @@ class PurchasableHeroTest {
     void setup() {
         field = new Field(10, 10);
 
-        playerCastle = new Castle(new Position(1, 1), 1000, field);
-        enemyCastle = new Castle(new Position(8, 8), 1000, field);
+        playerCastle = new Castle(new Position(1, 1), 1000, field,"31;47");
+        enemyCastle = new Castle(new Position(8, 8), 1000, field,"31;47");
         field.getCell(1, 1).addObject(playerCastle);
         field.getCell(8, 8).addObject(enemyCastle);
 
@@ -47,10 +47,10 @@ class PurchasableHeroTest {
     void testMoveTowardsEnemyCastleEventuallyMoves() {
         Field field = new Field(5, 5);
 
-        Castle enemyCastle = new Castle(new Position(4, 4), 2000, field);
+        Castle enemyCastle = new Castle(new Position(4, 4), 2000, field, "31;47");
         field.getCell(4, 4).addObject(enemyCastle);
 
-        Castle myCastle = new Castle(new Position(0, 0), 2000, field);
+        Castle myCastle = new Castle(new Position(0, 0), 2000, field, "31;47");
         field.getCell(0, 0).addObject(myCastle);
 
         ComputerHero owner = new ComputerHero(new Position(1, 1), enemyCastle.getPosition(), 10, myCastle, 1000);

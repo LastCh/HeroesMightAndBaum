@@ -37,7 +37,6 @@ public class ComputerHero extends Hero {
         this.addGold((int)(100 * karma));
     }
 
-
     public void makeMove(Field field) {
         if (!this.isAlive()) {
             handleRevive(field);
@@ -107,7 +106,6 @@ public class ComputerHero extends Hero {
         }
         return false;
     }
-
 
     private void autoBuy(Field field) {
         buildStableIfNeeded();
@@ -198,7 +196,6 @@ public class ComputerHero extends Hero {
         }
     }
 
-
     private void moveTowardsCastle(Field field) {
         if (getPosition().equals(targetCastle)) {
             return;
@@ -266,7 +263,6 @@ public class ComputerHero extends Hero {
         return "ComputerHero";
     }
 
-
     public static ComputerHero deserialize(String data, Field field, Castle myCastle) {
         String[] parts = data.split(";");
         String name = parts[0];
@@ -280,12 +276,17 @@ public class ComputerHero extends Hero {
 
         String[] pos = parts[8].split(",");
         String[] targetPos = parts[9].split(",");
-        String unitData = parts.length > 10 ? parts[10] : "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 6; i < parts.length; i++) {
+            sb.append(parts[i]);
+            if (i < parts.length - 1) sb.append(";");
+        }
+        String unitData = sb.toString();
 
         Position position = new Position(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]));
         Position target = new Position(Integer.parseInt(targetPos[0]), Integer.parseInt(targetPos[1]));
 
-        ComputerHero hero = new ComputerHero(position, target, 10, myCastle, gold);
+        ComputerHero hero = new ComputerHero(position, target, 2, myCastle, gold);
         hero.name = name;
         hero.health = health;
         hero.stableBought = stableBought;
@@ -295,6 +296,10 @@ public class ComputerHero extends Hero {
         hero.preferX = preferX;
 
         hero.deserializeUnits(unitData);
+        int totalPower = hero.getUnits().stream()
+                .mapToInt(Unit::getPower)
+                .sum();
+        hero.setPower(totalPower);
         field.getCell(position.x(), position.y()).addObject(hero);
         return hero;
     }

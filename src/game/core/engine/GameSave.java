@@ -6,11 +6,11 @@ import game.map.Field;
 import game.model.building.onmap.Castle;
 import game.model.hero.ComputerHero;
 import game.model.hero.HumanHero;
+import game.model.hero.PurchasableHero;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static game.api.LogConfig.LOGGER;
 
@@ -71,7 +71,7 @@ public class GameSave {
                 writer.newLine();
                 LOGGER.info("Замки сохранены");
 
-                updatePlayerKarma(saveData.ownerName, saveData.humanHero.getKarma());
+                KarmaManager.updatePlayerKarma(saveData.ownerName, saveData.humanHero.getKarma());
                 saveData.humanHero.resetKarma();
 
                 writer.write(saveData.humanHero.serialize());
@@ -87,7 +87,6 @@ public class GameSave {
             System.out.println("❌ Ошибка при сохранении: " + e.getMessage());
         }
     }
-
 
     public GameSave loadGame(String slotName) {
         try {
@@ -140,7 +139,7 @@ public class GameSave {
                             computerHero,
                             humanHero
                     );
-                    field.getCell(x, y).getObjects().clear(); // очистка по-умолчанию
+                    field.getCell(x, y).getObjects().clear();
                     for (FieldObject obj : cell.getObjects()) {
                         field.getCell(x, y).addObject(obj);
                     }
@@ -155,8 +154,12 @@ public class GameSave {
             reader.close();
             System.out.println("✅ Игра загружена из слота " + slotName);
 
-            double karma = loadPlayerKarma(ownerName);
+            double karma = KarmaManager.loadPlayerKarma(ownerName);
             computerHero.addBenefit(karma);
+
+            addPurchasableHeroesToAll(field);
+            LOGGER.info("Все герои учтены");
+
             return new GameSave(computerHero, humanHero, castlePlayer, castleComputer, field, saveName, ownerName);
         } catch (IOException e) {
             LOGGER.severe("Ошибка при загрузке: " + e.getMessage());
@@ -165,70 +168,16 @@ public class GameSave {
         }
     }
 
-    public double loadPlayerKarma(String playerName) {
-        File file = new File("players.txt");
-        if (!file.exists()) {
-            LOGGER.warning("Файл players.txt не найден.");
-            return 0;
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(";");
-                if (parts.length >= 2 && parts[0].equalsIgnoreCase(playerName)) {
-                    return Double.parseDouble(parts[1]);
-                }
+    private void addPurchasableHeroesToAll(Field field) {
+        field.getAllHeroes().clear();
+        for (int x = 0; x < field.getWidth(); x++) {
+            for (int y = 0; y < field.getHeight(); y++) {
+                field.getCell(x, y).getObjects().stream()
+                        .filter(o -> o instanceof PurchasableHero)
+                        .map(o -> (PurchasableHero)o)
+                        .forEach(field::addHeroToAll);
             }
-        } catch (IOException | NumberFormatException e) {
-            LOGGER.warning("Не удалось прочитать карму игрока: " + e.getMessage());
-        }
-
-        return 0;
-    }
-
-    private static void updatePlayerKarma(String name, double karma) {
-        File file = new File("players.txt");
-        List<String[]> entries = new ArrayList<>();
-        boolean updated = false;
-
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(";");
-                    if (parts[0].equalsIgnoreCase(name)) {
-                        // Обновляем карму, победы оставляем
-                        double oldKarma = Double.parseDouble(parts[1]);
-                        int wins = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
-                        double newKarma = oldKarma + karma;
-                        entries.add(new String[]{name, String.format(Locale.ENGLISH,"%.1f", newKarma), String.valueOf(wins)});
-                        updated = true;
-                    } else {
-                        entries.add(parts);
-                    }
-                }
-            } catch (IOException | NumberFormatException e) {
-                LOGGER.warning("Ошибка при чтении players.txt: " + e.getMessage());
-            }
-        }
-
-        // Если игрок новый
-        if (!updated) {
-            entries.add(new String[]{name, String.format(Locale.ENGLISH,"%.1f", karma), "0"});
-        }
-
-        // Перезаписываем файл
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (String[] entry : entries) {
-                writer.write(String.join(";", entry));
-                writer.newLine();
-            }
-            LOGGER.info("Обновлена карма игрока в players.txt: " + name + " → +" + karma);
-        } catch (IOException e) {
-            LOGGER.severe("Ошибка записи в players.txt: " + e.getMessage());
         }
     }
-
 
 }
