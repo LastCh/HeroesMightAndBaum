@@ -9,11 +9,16 @@ import game.model.hero.HumanHero;
 import game.model.hero.ComputerHero;
 
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 import static game.api.LogConfig.LOGGER;
+import static game.api.LogConfig.NPC_LOGGER;
 
 public class GameManager {
+    private final ScheduledExecutorService circusSpawn = Executors.newSingleThreadScheduledExecutor();
     private Field field;
     private HumanHero human;
     private ComputerHero computer;
@@ -51,6 +56,8 @@ public class GameManager {
 
         human = new HumanHero(new Position(0, 0), 10, playerCastle, 1000);
         computer = new ComputerHero(new Position(9, 9), playerCastle.getPosition(), 2, botCastle, 500);
+        human.initAllKarma(playerName);
+
         field.getCell(human.getPosition().x(),human.getPosition().y()).addObject(human);
         field.getCell(computer.getPosition().x(),computer.getPosition().y()).addObject(computer);
 
@@ -114,6 +121,7 @@ public class GameManager {
         LOGGER.info("Запуск игрового цикла");
         Render render = new Render(field, human, scanner, computer, playerCastle, botCastle);
         clearConsole();
+        startCircusSpawner();
         render.startGameLoop(this);
     }
 
@@ -127,11 +135,13 @@ public class GameManager {
 
         human = gSave.humanHero;
         computer = gSave.computerHero;
+        human.initAllKarma(playerName);
 
         gameSave = new GameSave(computer, human, playerCastle, botCastle, field, gameName, playerName);
 
         Render render = new Render(field, human, scanner, computer, playerCastle, botCastle);
         clearConsole();
+        startCircusSpawner();
         render.startGameLoop(this);
     }
 
@@ -182,6 +192,7 @@ public class GameManager {
         System.out.println("✅ Игра загружена с пользовательской карты.");
         Render render = new Render(field, human, scanner, computer, playerCastle, botCastle);
         clearConsole();
+        startCircusSpawner();
         render.startGameLoop(this);
     }
 
@@ -200,6 +211,39 @@ public class GameManager {
 
     public void clearConsole() {
         for (int i = 0; i < 50; i++) System.out.println();
+    }
+
+    private void trySpawnCircus() {
+        if (field == null) return;
+
+        field.findObjects(WanderingCircus.class).removeIf(circus -> {
+            if (circus.isExpired()) {
+                field.getCell(circus.getPosition().x(), circus.getPosition().y())
+                        .removeObject(circus);
+                NPC_LOGGER.info("[CIRCUS] исчез в " + circus.getPosition());
+                return true;
+            }
+            return false;
+        });
+
+        NPC_LOGGER.info("[CIRCUS-TICK]");
+
+        if (field.findObjects(WanderingCircus.class).size() >= 2) return;
+        if (ThreadLocalRandom.current().nextDouble() >= 0.15)      return;
+
+        field.randomFreeCell().ifPresent(pos -> {
+            WanderingCircus c = new WanderingCircus(pos, field);
+            field.getCell(pos.x(), pos.y()).addObject(c);
+            NPC_LOGGER.info("[CIRCUS] появился в " + pos);
+        });
+    }
+
+
+    private void startCircusSpawner() {
+        // повторно не запускаем
+        if (!circusSpawn.isShutdown())
+            circusSpawn.scheduleAtFixedRate(this::trySpawnCircus,
+                    0, 10, TimeUnit.SECONDS);
     }
 
     public GameSave getGameSave() { return gameSave; }

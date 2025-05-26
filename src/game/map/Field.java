@@ -10,6 +10,7 @@ import game.model.hero.Hero;
 import game.model.hero.PurchasableHero;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Field {
     protected final int width;
@@ -250,6 +251,34 @@ public class Field {
             }
         }
         return sb.toString();
+    }
+
+    // Найти ПЕРВЫЙ объект указанного типа
+    public <T extends FieldObject> java.util.Optional<T> findObject(Class<T> type) {
+        return findObjects(type).stream().findFirst();
+    }
+
+    // Найти ВСЕ объекты указанного типа
+    public <T extends FieldObject> List<T> findObjects(Class<T> type) {
+        List<T> res = new ArrayList<>();
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                for (FieldObject obj : grid[x][y].getObjects())
+                    if (type.isInstance(obj)) res.add(type.cast(obj));
+        return res;
+    }
+
+    // Случайная свободная клетка (Optional.empty() если вся карта занята)
+    public java.util.Optional<Position> randomFreeCell() {
+        java.util.List<Position> free = new java.util.ArrayList<>();
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                if (grid[x][y].isEmpty()) free.add(new Position(x, y));
+
+        if (free.isEmpty()) return java.util.Optional.empty();
+        return java.util.Optional.of(
+                free.get(java.util.concurrent.ThreadLocalRandom.current()
+                        .nextInt(free.size())));
     }
 
     public static Field deserialize(String data, Castle castlePlayer, Castle castleComputer,

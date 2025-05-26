@@ -4,11 +4,13 @@ import game.api.Position;
 import game.interf.GameMenu;
 import game.interf.MenuManager;
 import game.map.Field;
+import game.model.building.incastle.GameBuildings;
 import game.model.building.onmap.Castle;
 import game.model.hero.ComputerHero;
 import game.model.hero.Hero;
 import game.model.hero.HumanHero;
 import game.model.hero.PurchasableHero;
+import game.model.unit.GameUnits;
 
 import java.util.List;
 import java.util.Scanner;
@@ -98,6 +100,11 @@ public class Render {
                     if (back) return;
                 }
 
+                case "CHEAT" -> {
+                    clearConsole();
+                    cheat();
+                }
+
                 default -> {
                     clearConsole();
                     LOGGER.warning("Неверный ввод команды: " + input);
@@ -116,6 +123,7 @@ public class Render {
                 player.setGold(200);
                 player.move(0,0,field, 0);
                 player.setHealth(100);
+                player.setPower(0);
             }
             if (!computerPlayer.isAlive()) {
                 computerPlayer.resetMovementPoints();
@@ -226,6 +234,24 @@ public class Render {
             return true;
         }
         return false;
+    }
+
+    private void cheat() {
+        player.getMyCastle().addBuilding(GameBuildings.ARMORY);
+        player.getMyCastle().addBuilding(GameBuildings.ARENA);
+        player.getMyCastle().addBuilding(GameBuildings.CROSSBOWMENS_TOWER);
+        player.getMyCastle().addBuilding(GameBuildings.GUARD_POST);
+        player.getMyCastle().addBuilding(GameBuildings.STABLE);
+        player.getMyCastle().addBuilding(GameBuildings.TAVERN);
+        player.getMyCastle().setHealth(100000000);
+        player.setPower(100000000);
+        player.setGold(100000000);
+        player.setHealth(10000000);
+        player.setMaxMovementPoints(10000000);
+        player.resetMovementPoints();
+        for (int i = 0; i < 40; i++) {
+            player.addUnits(GameUnits.PALADIN.cloneUnit());
+        }
     }
 
     private void clearConsole() {

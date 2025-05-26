@@ -31,6 +31,6 @@ public abstract class FieldObject {
         coloredSymbol = symb;
     }
 
-    public abstract String serialize();           // состояние объекта
-    public abstract String getClassName();        // имя класса для восстановления
+    public abstract String serialize();
+    public abstract String getClassName();
 }

@@ -150,4 +150,7 @@ public class Castle extends FieldObject implements Immovable {
         return field;
     }
 
+    public void setHealth(int health) {
+        this.health = health;
+    }
 }

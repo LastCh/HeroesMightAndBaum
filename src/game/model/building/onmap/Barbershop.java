@@ -26,7 +26,7 @@ public class Barbershop extends Enterprise {
     );
 
     public Barbershop(Position position, Field field, String color) {
-        super(position, color+ "\u2702" + "\u001B[0m", 2, field,
+        super(position, color+ "\u2702" + "\u2702" + "\u001B[0m", 2, field,
                 5, 10, 10, 0.3);
     }
 

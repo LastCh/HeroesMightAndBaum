@@ -17,7 +17,7 @@ public class Restaurant extends Enterprise {
     );
 
     public Restaurant(Position position, Field field, String color) {
-        super(position, color+ "\uD83C\uDF7D" + "\u001B[0m", 2, field,
+        super(position, color+ "\uD83C\uDF7D" + "\uD83C\uDF7D" +  "\u001B[0m", 2, field,
                 10, 14, 10, 0.2);
     }
     @Override

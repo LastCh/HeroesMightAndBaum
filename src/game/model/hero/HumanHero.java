@@ -2,6 +2,7 @@ package game.model.hero;
 
 import game.api.FieldObject;
 import game.api.Position;
+import game.core.engine.KarmaManager;
 import game.map.Field;
 import game.model.building.incastle.GameBuildings;
 import game.model.building.onmap.*;
@@ -19,6 +20,7 @@ public class HumanHero extends Hero implements ServiceVisitor {
     private MagicalArtifact magicalArtifact;
     private String name;
     private double karma = 0;
+    private double allKarma = 0;
     private boolean fastCastleCapture = false;
     private int maxHP;
 
@@ -78,7 +80,6 @@ public class HumanHero extends Hero implements ServiceVisitor {
             cost--;
         }
 
-        // Трата очков за каждый ход и очков коэффициента поля
         cost--;
         cost -= (int)newAccumulatedMovementCoef;
 
@@ -97,7 +98,6 @@ public class HumanHero extends Hero implements ServiceVisitor {
         field.moveObject(this, this.position.x(), this.position.y(), newPos.x(), newPos.y());
         this.position = newPos;
 
-        // Взаимодействие с пещерой после того, как персонаж переместился
         interactWithGoldCave(field, newPos);
     }
 
@@ -184,6 +184,13 @@ public class HumanHero extends Hero implements ServiceVisitor {
                             if (choice == 1) enterprise.enter(this, Restaurant.SNACK);
                             else if (choice == 2) enterprise.enter(this, Restaurant.LUNCH);
                         }
+                        case "WanderingCircus" -> {
+                            if (choice == 1) {                       // игрок выбрал «Работать»
+                                enterprise.enter(this, WanderingCircus.WORK);
+                            }
+                            return false;
+                        }
+
                     }
 
                     if (choice == 3) {         // «Выйти» в вашем меню
@@ -316,9 +323,10 @@ public class HumanHero extends Hero implements ServiceVisitor {
 
     public double getKarma() { return karma;}
 
-    public void resetKarma() { karma = 0; }
-
-    public void addKarma(double karm) { karma += karm; }
+    public void addKarma(double karm) {
+        karma += karm;
+        allKarma += karm;
+    }
 
     public String getName() {
         return "Герой";
@@ -334,6 +342,10 @@ public class HumanHero extends Hero implements ServiceVisitor {
         System.out.println("🛌 Отряд отдохнул " + heal + " HP. Текущее: " + this.health);
     }
 
+    public void setMaxMovementPoints(int points) {
+        this.maxMovementPoints = points;
+    }
+
     public void boostMovement(int points) {
         this.movementPoints += points;
         System.out.println("💨 Герой получил +" + points + " к очкам передвижения. Текущие: " + this.movementPoints);
@@ -342,5 +354,16 @@ public class HumanHero extends Hero implements ServiceVisitor {
     public void reduceCastleCaptureTime() {
         fastCastleCapture = true;
         System.out.println("🏰 Теперь вы быстрее захватите замок!");
+    }
+
+    public void initAllKarma(String playerName) {
+        allKarma = KarmaManager.loadPlayerKarma(playerName);
+    }
+
+    public double getAllKarma() { return allKarma; }
+
+    public void resetKarma() {
+        KarmaManager.updatePlayerKarma(name, karma);
+        karma = 0;
     }
 }

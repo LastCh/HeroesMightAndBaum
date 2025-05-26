@@ -9,19 +9,23 @@ import java.util.Locale;
 import static game.api.LogConfig.LOGGER;
 
 public class KarmaManager {
-    private static final File PLAYERS_FILE = new File("players.txt");
+    static File playersFile = new File("players.txt");
+
     private static final DecimalFormat KARMA_FORMAT =
             new DecimalFormat("0.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
     public static void updatePlayerKarma(String name, double deltaKarma) {
         List<PlayerEntry> entries = loadEntries();
         boolean updated = updateEntry(entries, name, deltaKarma);
+
         if (!updated) {
-            entries.add(new PlayerEntry(name, deltaKarma, 0));
+            PlayerEntry entry = new PlayerEntry(name, 0, 0);
+            entry.addKarma(deltaKarma);
+            entries.add(entry);
+            LOGGER.info(String.format("Обновлена карма игрока: %s → +%s",
+                    name, KARMA_FORMAT.format(deltaKarma)));
         }
         saveEntries(entries);
-        LOGGER.info(String.format("Обновлена карма игрока: %s → +%s",
-                name, KARMA_FORMAT.format(deltaKarma)));
     }
 
     public static double loadPlayerKarma(String name) {
@@ -35,10 +39,10 @@ public class KarmaManager {
 
     private static List<PlayerEntry> loadEntries() {
         List<PlayerEntry> list = new ArrayList<>();
-        if (!PLAYERS_FILE.exists()) {
+        if (!playersFile.exists()) {
             return list;
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(PLAYERS_FILE))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(playersFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 PlayerEntry entry = PlayerEntry.parse(line);
@@ -62,8 +66,12 @@ public class KarmaManager {
         return false;
     }
 
+    static void _setPlayersFile(File f) {
+        playersFile = f;
+    }
+
     private static void saveEntries(List<PlayerEntry> entries) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PLAYERS_FILE))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(playersFile))) {
             for (PlayerEntry e : entries) {
                 writer.write(e.toLine());
                 writer.newLine();

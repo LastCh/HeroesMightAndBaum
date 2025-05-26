@@ -65,14 +65,12 @@ public abstract class Enterprise extends FieldObject implements Immovable {
         npcSpawner = Executors.newSingleThreadScheduledExecutor();
         simulationStarted = true;
 
-        // первый «залп» NPC
         spawnRandomVisitors(ThreadLocalRandom.current()
                 .nextInt(npcBatchMin, npcBatchMax + 1));
 
-        // периодическая активность
         npcSpawner.scheduleAtFixedRate(this::npcTick,
-                npcTickSec,      // первый запуск
-                npcTickSec,      // период
+                npcTickSec,
+                npcTickSec,
                 TimeUnit.SECONDS);
 
     }
@@ -158,13 +156,10 @@ public abstract class Enterprise extends FieldObject implements Immovable {
     public synchronized void changeCapacity(int newCap) {
         if (newCap == capacity) return;
 
-        // 1) останавливаем старый пул
         if (simulationStarted) pool.shutdownNow();
 
-        // 2) меняем поле (оно больше не final)
         this.capacity = newCap;
 
-        // 3) запускаем новый пул и пробуем посадить ожидающих
         pool = Executors.newFixedThreadPool(newCap);
         tryStartNext();
     }
@@ -172,8 +167,8 @@ public abstract class Enterprise extends FieldObject implements Immovable {
     public synchronized void shutdown() {
         if (!simulationStarted) return;
 
-        npcSpawner.shutdownNow();     // останавливаем тиковый планировщик
-        pool.shutdownNow();           // прерываем все ServiceTask
+        npcSpawner.shutdownNow();
+        pool.shutdownNow();
         waitingQueue.clear();
         currentVisitors.clear();
         simulationStarted = false;

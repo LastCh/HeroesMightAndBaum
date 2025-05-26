@@ -169,10 +169,6 @@ public abstract class Hero extends FieldObject{
 
     public boolean isAlive() { return health > 0; }
 
-    public void move(int dx, int dy, Field field) {
-        updatePosition(position.x() + dx, position.y() + dy);
-    }
-
     public void updatePosition(int newX, int newY) { this.position = new Position(newX, newY); }
 
     @Override
@@ -206,7 +202,12 @@ public abstract class Hero extends FieldObject{
 
     public void addGold(int money) { gold += money; }
 
-    public void spendMoney(int cost) { gold -= cost; }
+    public void spendMoney(int cost) {
+        gold -= cost;
+        if( gold<0 ) {
+            gold = 0;
+        }
+    }
 
     public Field getField() { return castle.getField(); }
 
