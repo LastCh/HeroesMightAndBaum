@@ -22,7 +22,7 @@ public abstract class Enterprise extends FieldObject implements Immovable {
     protected  int capacity;
 
     protected final List<ServiceVisitor> currentVisitors = new ArrayList<>();
-    private   final Queue<QueueEntry> waitingQueue = new ArrayDeque<>();
+    private final Queue<QueueEntry> waitingQueue = new ArrayDeque<>();
 
     private ExecutorService pool;
     private ScheduledExecutorService npcSpawner;

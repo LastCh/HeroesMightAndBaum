@@ -277,7 +277,7 @@ public class ComputerHero extends Hero {
         String[] pos = parts[8].split(",");
         String[] targetPos = parts[9].split(",");
         StringBuilder sb = new StringBuilder();
-        for (int i = 6; i < parts.length; i++) {
+        for (int i = 10; i < parts.length; i++) {
             sb.append(parts[i]);
             if (i < parts.length - 1) sb.append(";");
         }

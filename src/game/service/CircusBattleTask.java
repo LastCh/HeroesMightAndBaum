@@ -31,7 +31,6 @@ public class CircusBattleTask implements Runnable {
         NPC_LOGGER.info("[CIRCUS] " + hero.getName() + " был избит труппой на " + power + " урона");
     }
 
-
     private List<Unit> generateRandomTroupe() {
         Unit[] pool = { GameUnits.SPEARMAN, GameUnits.CROSSBOWMAN,
                 GameUnits.SWORDSMAN, GameUnits.CAVALRYMAN };

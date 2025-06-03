@@ -82,7 +82,7 @@ public class BuyBuildingMenu extends Inter {
                 player.spendMoney(GameBuildings.GUARD_POST.getCost());
                 player.getMyCastle().addBuilding(GameBuildings.GUARD_POST);
                 showGold.run();
-                System.out.println(GREEN + "🛡️ Сторожевая башня построена! Доступны копейщики!" + RESET);
+                System.out.println(GREEN + "🛡️ Сторожевой пост построен! Доступны копейщики!" + RESET);
                 break;
 
             case 4: // Башня арбалетчиков
